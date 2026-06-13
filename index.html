@@ -1003,7 +1003,8 @@ const SUPABASE_KEY = 'sb_publishable_kfv_OoeEFDn0_tStQ421AQ_W4V2Sy_M';
 
 const state = {
   email:null, pain_point:null, tool:null, team_size:null,
-  submitted_at:null, source:document.referrer||'direct', _id:null
+  submitted_at:null, source:document.referrer||'direct', _id:null,
+  session_id:(window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`)
 };
 
 // ── ALFARO VARIANT MAPPING ─────────────────────────
@@ -1072,6 +1073,7 @@ function setupHovers() {
 // ── TRACKING ───────────────────────────────────────
 function track(event, props={}) {
   try { if (window.posthog) window.posthog.capture(event, props); } catch(e){}
+  insertEvent(event, props);
 }
 
 // ── EMAIL SUBMIT ───────────────────────────────────
@@ -1105,17 +1107,21 @@ function selectCard(card, group) {
   card.classList.add('selected');
   const key = group==='pain'?'pain_point':group==='tool'?'tool':'team_size';
   state[key] = card.id;
-  track('waitlist_option_selected', {group, selected_id:card.id, email:state.email});
+  track('waitlist_option_selected', {
+    group,
+    selected_id:card.id,
+    option_label:card.querySelector('.card-title')?.textContent?.trim() || card.id,
+    email:state.email
+  });
 }
 
 // ── NAV ────────────────────────────────────────────
-function nextTo(toScreen) { updateSupabase(); goTo(toScreen, progressFor(toScreen)); }
+function nextTo(toScreen) { goTo(toScreen, progressFor(toScreen)); }
 function skipTo(toScreen, fromScreen) {
   track('waitlist_question_skipped', {skipped_screen:fromScreen, email:state.email});
   goTo(toScreen, progressFor(toScreen));
 }
 function finishWaitlist() {
-  updateSupabase();
   track('waitlist_completed', {email:state.email, pain_point:state.pain_point, tool:state.tool, team_size:state.team_size});
   goTo('screen-thanks', 100); fetchCount();
 }
@@ -1157,18 +1163,33 @@ async function insertSupabase() {
   }
 }
 async function updateSupabase() {
-  if (!state.email) return;
+  return;
+}
+async function insertEvent(eventName, props={}) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/waitlist?email=eq.${encodeURIComponent(state.email)}`, {
-      method:'PATCH',
+    await fetch(`${SUPABASE_URL}/rest/v1/waitlist_events`, {
+      method:'POST',
       headers:{
         'Content-Type':'application/json',
         'apikey':SUPABASE_KEY,
-        'Authorization':`Bearer ${SUPABASE_KEY}`
+        'Authorization':`Bearer ${SUPABASE_KEY}`,
+        'Prefer':'return=minimal'
       },
-      body:JSON.stringify({pain_point:state.pain_point, tool:state.tool, team_size:state.team_size})
+      body:JSON.stringify({
+        email:state.email || props.email || null,
+        session_id:state.session_id,
+        event_name:eventName,
+        event_group:props.group || null,
+        option_id:props.selected_id || null,
+        option_label:props.option_label || null,
+        screen:props.skipped_screen || null,
+        source:state.source,
+        page_url:location.href,
+        user_agent:navigator.userAgent,
+        properties:props
+      })
     });
-  } catch(e){ console.warn('Supabase update:',e); }
+  } catch(e){ console.warn('Supabase event:',e); }
 }
 async function fetchCount() {
   try {
