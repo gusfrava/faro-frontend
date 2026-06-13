@@ -1134,6 +1134,19 @@ async function submitEmail() {
     return;
   }
   identifyUser(email);
+  if (insertResult.status === 'already_in') {
+    track('waitlist_duplicate_email_detected', {
+      email,
+      source:state.source,
+      step:'duplicate_email',
+      step_label:'Duplicate email detected'
+    });
+    btn.textContent='you are already in';
+    setTimeout(() => {
+      window.location.href = `faro_games.html?email=${encodeURIComponent(email)}&from=duplicate`;
+    }, 250);
+    return;
+  }
   track('waitlist_email_submitted', {
     email,
     source:state.source,
