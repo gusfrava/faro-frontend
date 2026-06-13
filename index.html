@@ -1109,6 +1109,10 @@ function groupLabel(group) {
   return group === 'pain' ? 'pain_point' : group === 'tool' ? 'helpdesk_tool' : 'team_size';
 }
 
+function selectionEventName(group) {
+  return group === 'pain' ? 'waitlist_pain_selected' : group === 'tool' ? 'waitlist_tool_selected' : 'waitlist_team_size_selected';
+}
+
 // ── EMAIL SUBMIT ───────────────────────────────────
 async function submitEmail() {
   const input = document.getElementById('email-input');
@@ -1148,13 +1152,15 @@ function selectCard(card, group) {
   const key = group==='pain'?'pain_point':group==='tool'?'tool':'team_size';
   state[key] = card.id;
   const selectedLabel = card.querySelector('.card-title')?.textContent?.trim() || card.id;
-  track('waitlist_option_selected', {
+  track(selectionEventName(group), {
     group,
     step:groupLabel(group),
     step_label:groupLabel(group).replace('_',' '),
     selected_id:card.id,
     selected_label:selectedLabel,
     option_label:selectedLabel,
+    [key]:card.id,
+    [`${key}_label`]:selectedLabel,
     email:state.email
   });
 }
