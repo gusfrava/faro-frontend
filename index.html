@@ -1143,7 +1143,9 @@ async function submitEmail() {
     });
     btn.textContent='you are already in';
     setTimeout(() => {
-      window.location.href = `faro_games.html?email=${encodeURIComponent(email)}&from=duplicate`;
+      sessionStorage.setItem('faro_duplicate_email', email);
+      sessionStorage.setItem('faro_games_source', 'duplicate');
+      window.location.href = 'games/';
     }, 250);
     return;
   }
