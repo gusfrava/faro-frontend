@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faro · Join the waitlist</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'><rect width='32' height='32' rx='6' fill='%232d6a4f'/><rect x='14' y='2' width='4' height='4' fill='%23b7c99a'/><rect x='12' y='6' width='8' height='4' fill='%23b7c99a'/><rect x='10' y='10' width='12' height='4' fill='%23eef2e6'/><rect x='12' y='14' width='8' height='10' fill='%237d8c4f'/><rect x='10' y='24' width='12' height='2' fill='%23b7c99a'/><rect x='6' y='26' width='20' height='4' fill='%23b7c99a'/></svg>">
+<style>
+:root{
+  --dark:#2d6a4f;--mid:#7d8c4f;--light:#b7c99a;
+  --tint:#eef2e6;--cream:#faf8f4;--white:#fffefb;
+  --text:#1c2b1e;--muted:#6b7f6e;--border:#d4e0c8;
+  --coral:#e07b54;--amber:#c4933f;--outline:#173823;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+header{padding:18px 32px;background:var(--white);border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:28px;height:28px;background:var(--dark);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.logo-text{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--dark);}
+.header-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+
+/* PROGRESS */
+.progress-wrap{height:3px;background:var(--border);}
+.progress-fill{height:100%;background:var(--dark);transition:width .3s ease;}
+
+/* MAIN */
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px;}
+.screen{display:none;width:100%;max-width:580px;}
+.screen.active{display:block;}
+
+/* EYEBROW */
+.eyebrow{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--mid);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.eyebrow::before{content:'';width:16px;height:1.5px;background:var(--light);}
+
+/* TYPOGRAPHY */
+.screen-title{font-size:30px;font-weight:700;color:var(--dark);margin-bottom:8px;letter-spacing:-.5px;line-height:1.2;}
+.screen-sub{font-size:14px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.7;margin-bottom:32px;}
+
+/* EMAIL */
+.email-form{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.email-input{flex:1;min-width:200px;padding:13px 16px;border:2px solid var(--border);border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);outline:none;transition:border-color .15s;}
+.email-input:focus{border-color:var(--dark);}
+.email-input.error{border-color:var(--coral);}
+.btn-submit{background:var(--dark);color:#fff;border:none;padding:13px 24px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+.email-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;}
+.email-note::before{content:'→ ';color:var(--light);}
+.error-msg{font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);margin-top:4px;display:none;}
+.error-msg.show{display:block;}
+
+/* CARD GRID */
+.cards-outer{position:relative;overflow:visible;}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;}
+.cards-3{grid-template-columns:repeat(3,1fr);}
+
+/* Cards sit on z-index:2 so they cover Alfaro who is at z-index:1 */
+.option-card{
+  background:var(--white);
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:18px 16px;
+  cursor:pointer;
+  text-align:left;
+  min-height:90px;
+  transition:border-color .15s, background .15s;
+  position:relative;
+  z-index:2; /* card sits ON TOP of Alfaro */
+}
+.option-card:hover{border-color:var(--dark);background:var(--tint);}
+.option-card.selected{border-color:var(--dark);background:var(--tint);box-shadow:0 0 0 1px var(--dark);}
+.option-card.selected::after{
+  content:'✓';position:absolute;top:10px;right:12px;
+  width:18px;height:18px;background:var(--dark);color:#fff;
+  border-radius:50%;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.35;}
+.card-sub{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.5;}
+
+/* ALFARO PEEK
+   Alfaro is at z-index:1 — BEHIND the cards.
+   He's positioned so most of his body is hidden under the card,
+   only his head/side peeks out from the outer edge.
+
+   Left:  Alfaro faces right, his LEFT side is hidden under left-col card
+   Right: Alfaro faces left (mirrored), his RIGHT side hidden under right-col card
+
+   Vertically: Alfaro is centered on the card row
+   Horizontally: shifted so ~60% of him is under the card
+*/
+.alfaro-left,.alfaro-right{
+  position:absolute;
+  width:110px;  /* big enough to see his face clearly */
+  height:110px;
+  display:none;
+  pointer-events:none;
+  z-index:1; /* BEHIND the cards */
+}
+
+/* Left side: face sticks out LEFT of the card.
+   Alfaro viewBox is 0-128. His face is roughly x:32-96.
+   We want his face visible, body hidden under card.
+   Shift him so right ~40% of his width is under the card. */
+.alfaro-left{
+  left:-68px; /* face visible on left, body disappears under card */
+}
+
+/* Right side: mirrored — face sticks out RIGHT of the card. */
+.alfaro-right{
+  right:-68px;
+  transform:scaleX(-1);
+}
+
+.alfaro-left.show,.alfaro-right.show{ display:block; }
+
+/* ACTIONS */
+.actions{display:flex;justify-content:space-between;align-items:center;}
+.btn-next{background:var(--dark);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-skip{background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;font-family:'DM Mono',monospace;padding:8px 0;}
+.btn-skip:hover{color:var(--dark);}
+
+/* THANK YOU */
+.thankyou{text-align:center;padding:24px 0;}
+.thankyou-alfaro{display:flex;justify-content:center;margin-bottom:20px;}
+.thankyou h2{font-size:28px;font-weight:700;color:var(--dark);margin-bottom:10px;}
+.thankyou p{font-size:14px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.8;margin-bottom:6px;}
+.waitlist-pill{display:inline-flex;align-items:center;gap:6px;background:var(--tint);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--dark);margin:16px 0;}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:var(--mid);}
+.share-note{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:20px;line-height:1.7;}
+
+
+/* TOOL LOGOS */
+.tool-logo{width:32px;height:32px;margin-bottom:10px;display:block;}
+.card-title-row{display:flex;align-items:center;gap:10px;margin-bottom:3px;}
+
+
+
+/* NOTEPAD FOUNDER NOTE */
+.founder-note {
+  background: rgba(255,254,251,0.7);
+  border: 2px solid var(--border);
+  border-left: 5px solid var(--mid);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 20px 0;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 20px rgba(45,106,79,0.06);
+}
+.notepad-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1.5px solid var(--border);
+  background: rgba(238,242,230,0.5);
+  position: relative;
+}
+.notepad-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.notepad-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+}
+.notepad-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.notepad-holes {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+}
+.hole {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+}
+/* lined notepad paper */
+.notepad-body {
+  padding: 16px 20px 12px;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(212,224,200,0.4) 27px,
+    rgba(212,224,200,0.4) 28px
+  );
+  background-size: 100% 28px;
+  background-position: 0 14px;
+}
+.notepad-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.95;
+  margin: 0 0 8px;
+  padding-left: 4px;
+}
+.notepad-text:last-of-type { margin-bottom: 0; }
+.notepad-sig {
+  margin-top: 8px;
+  padding-top: 4px;
+}
+.sig-img {
+  height: 52px;
+  width: auto;
+  /* remove white background from signature photo */
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  filter: contrast(1.3) brightness(0.9);
+}
+
+/* FOUNDER NOTE */
+.founder-note{
+  background:var(--tint);border:1.5px solid var(--border);
+  border-radius:14px;padding:20px;margin:20px 0;text-align:left;
+}
+.founder-note-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.founder-note-name{font-size:13px;font-weight:600;color:var(--dark);}
+.founder-note-sub{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;}
+.founder-note-body{font-size:13px;color:var(--text);line-height:1.8;font-family:'DM Mono',monospace;}
+.founder-note-sig{font-size:13px;color:var(--mid);margin-top:12px;font-family:'DM Mono',monospace;}
+
+/* SHARE SECTION */
+.share-section{margin-top:24px;text-align:center;}
+.share-label{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:10px;}
+.share-row{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;}
+.share-actions{position:relative;display:inline-flex;}
+.share-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--dark);color:#fff;border:none;
+  padding:8px 14px;border-radius:8px;font-size:12px;
+  font-family:'DM Mono',monospace;cursor:pointer;
+  text-decoration:none;
+}
+.share-btn:hover{background:#1e4f3a;}
+.share-icon-btn{
+  width:36px;height:36px;justify-content:center;padding:0;
+  background:var(--white);border:1.5px solid var(--border);
+}
+.share-icon-btn:hover{background:var(--tint);border-color:var(--dark);}
+.share-icon-img{width:19px;height:19px;object-fit:contain;display:block;image-rendering:pixelated;}
+.share-btn-twitter{background:#000;}
+.share-btn-twitter:hover{background:#222;}
+.share-btn-linkedin{background:#0a66c2;}
+.share-btn-linkedin:hover{background:#084f96;}
+.share-btn-facebook{background:#1877f2;}
+.share-btn-facebook:hover{background:#125fc4;}
+.share-btn-whatsapp{background:#2d6a4f;}
+.share-btn-whatsapp:hover{background:#1e4f3a;}
+.share-btn-email{background:#7d8c4f;}
+.share-btn-email:hover{background:#657542;}
+.share-menu{
+  position:absolute;right:0;top:calc(100% + 8px);display:none;min-width:180px;
+  background:var(--white);border:1.5px solid var(--border);border-radius:12px;
+  padding:8px;box-shadow:0 16px 36px rgba(45,106,79,.14);z-index:20;
+}
+.share-menu.show{display:grid;gap:6px;}
+.share-menu::before{
+  content:'';position:absolute;top:-7px;right:18px;width:12px;height:12px;
+  background:var(--white);border-left:1.5px solid var(--border);
+  border-top:1.5px solid var(--border);transform:rotate(45deg);
+}
+.share-menu .share-btn{
+  width:100%;justify-content:flex-start;background:transparent;color:var(--dark);
+  border:1px solid transparent;padding:8px 10px;
+}
+.share-menu .share-btn:hover{background:var(--tint);border-color:var(--border);}
+
+/* FOOTER */
+footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+
+
+/* THANK-YOU COMPOSITION OVERRIDES */
+#screen-thanks{max-width:880px;}
+.thankyou-composed{text-align:left;padding:10px 0 26px;}
+.thankyou-hero{
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;
+  margin:0 auto 32px;max-width:720px;
+}
+.thankyou-celebration{
+  position:relative;width:86px;height:72px;display:flex;align-items:flex-end;justify-content:center;
+  margin-bottom:2px;filter:drop-shadow(0 10px 16px rgba(196,147,63,.16));
+}
+.celebration-faro{width:66px;height:66px;image-rendering:pixelated;}
+.pixel-confetti{
+  position:absolute;width:5px;height:5px;background:var(--amber);
+  box-shadow:0 0 0 1px rgba(196,147,63,.20);image-rendering:pixelated;
+}
+.pixel-confetti.c1{left:16px;top:15px;background:var(--light);}
+.pixel-confetti.c2{right:15px;top:11px;background:var(--amber);}
+.pixel-confetti.c3{right:4px;top:26px;width:4px;height:4px;background:#f0b85a;}
+.pixel-confetti.c4{left:6px;top:34px;width:4px;height:4px;background:var(--mid);}
+.thankyou-copy h2{
+  font-size:34px;font-weight:700;color:var(--dark);line-height:1.1;
+  margin:0 0 10px;letter-spacing:-.6px;
+}
+.thankyou-title-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+.thankyou-title-row h2{margin:0;}
+.happy-spark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:9px;background:rgba(255,216,77,.28);
+  border:1.5px solid rgba(196,147,63,.34);color:var(--amber);
+  font-family:'Press Start 2P',monospace;font-size:12px;line-height:1;
+}
+.thankyou-copy p{
+  font-size:14px;color:var(--muted);font-family:'DM Mono',monospace;
+  line-height:1.75;margin-bottom:4px;
+}
+.founder-note{
+  position:relative;max-width:840px;margin:8px auto 24px;padding:0;text-align:left;
+  background:#fffefb;border:1.5px solid var(--border);border-radius:16px;
+  overflow:visible;box-shadow:0 18px 44px rgba(45,106,79,.10);
+  transform:rotate(-.35deg);
+}
+.founder-note::before{
+  content:'';position:absolute;inset:12px;border:1px solid rgba(212,224,200,.48);
+  border-radius:12px;pointer-events:none;
+}
+.note-pin{
+  position:absolute;top:-8px;width:18px;height:18px;border-radius:50%;
+  background:var(--sage-light,var(--light));border:2px solid var(--white);
+  box-shadow:0 2px 8px rgba(45,106,79,.18);z-index:2;
+}
+.note-pin-left{left:34px;}
+.note-pin-right{right:34px;}
+.notepad-header{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:20px 28px 14px;border-bottom:1.5px solid var(--border);
+  background:linear-gradient(180deg,rgba(238,242,230,.72),rgba(255,254,251,.86));
+  border-radius:16px 16px 0 0;
+}
+.notepad-person{display:flex;align-items:center;gap:14px;min-width:0;}
+.notepad-avatar{
+  width:56px;height:56px;border-radius:12px;object-fit:cover;flex:0 0 auto;
+  border:2px solid var(--border);background:var(--tint);
+  box-shadow:0 6px 16px rgba(45,106,79,.10);
+  image-rendering:auto;
+}
+.notepad-name{font-size:15px;font-weight:700;color:var(--dark);}
+.notepad-title{
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);
+  margin-top:3px;line-height:1.5;
+}
+.notepad-mark{
+  font-family:'Press Start 2P',monospace;font-size:8px;color:var(--mid);
+  padding:8px 10px;border:1px solid var(--border);border-radius:10px;
+  background:rgba(250,248,244,.65);
+}
+.notepad-body{
+  padding:24px 34px 18px;
+  background:
+    linear-gradient(90deg,rgba(224,123,84,.24) 0 2px,transparent 2px 100%),
+    repeating-linear-gradient(transparent,transparent 31px,rgba(212,224,200,.46) 31px,rgba(212,224,200,.46) 32px);
+  background-position:24px 0,0 24px;
+}
+.notepad-text{
+  max-width:760px;font-family:'Segoe Print','Bradley Hand ITC','Comic Sans MS',cursive;
+  color:#14291d;font-size:15px;line-height:2.05;margin:0 0 10px;
+  letter-spacing:.01em;
+}
+.notepad-closing{font-weight:700;color:#173d2d;margin-top:2px;}
+.notepad-sig{
+  display:flex;justify-content:flex-end;align-items:center;margin-top:2px;
+  padding:0 16px 0 0;min-height:70px;
+}
+.sig-img{
+  width:230px;max-width:46%;height:auto;object-fit:contain;mix-blend-mode:normal;
+  opacity:.98;filter:contrast(1.12);
+}
+.share-section{margin-top:18px;text-align:center;}
+.share-label{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:10px;}
+
+@media (max-width:720px){
+  #screen-thanks{max-width:580px;}
+  .thankyou-hero{gap:14px;margin-bottom:26px;}
+  .founder-note{transform:none;}
+  .notepad-header{padding:18px 20px 12px;}
+  .notepad-avatar{width:48px;height:48px;border-radius:10px;}
+  .notepad-body{padding:22px 22px 16px;background-position:16px 0,0 24px;}
+  .notepad-text{font-size:14px;line-height:1.95;}
+  .sig-img{max-width:68%;width:210px;}
+}
+
+</style>
+
+<!-- ALFARO SVG DEFS — symbols reused throughout -->
+<svg width="0" height="0" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <filter id="softGlow" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="4" result="blur"/>
+    <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.95 0 1 0 0 0.65 0 0 1 0 0.12 0 0 0 0.70 0" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <style>
+    .px{shape-rendering:crispEdges;}
+    .outline{fill:#173823;} .body-dark{fill:#153828;} .body{fill:#2d6a4f;}
+    .body-mid{fill:#3f7a56;} .eye{fill:#f8f8ee;} .pupil{fill:#101c14;}
+    .mouth{fill:#101c14;} .wing{fill:#dfe8d7;opacity:.72;}
+    .antenna-light{fill:#ffd84d;} .antenna-hot{fill:#fff0a8;}
+    .belly{fill:#ffd84d;} .belly-shadow{fill:#e1a92e;}
+    .coral-el{fill:#e07b54;} .amber-el{fill:#c4933f;}
+    .wing-shadow{fill:#b7c99a;opacity:.55;}
+  </style>
+
+  <!-- BASE BODY (reused by all variants) -->
+  <symbol id="alf-base" viewBox="0 0 128 128">
+    <g class="px">
+      <rect x="43" y="108" width="42" height="4" fill="#173823" opacity=".16"/>
+      <rect class="wing" x="14" y="50" width="26" height="10"/>
+      <rect class="wing" x="18" y="62" width="20" height="8"/>
+      <rect class="wing" x="88" y="50" width="26" height="10"/>
+      <rect class="wing" x="90" y="62" width="20" height="8"/>
+      <rect class="outline" x="46" y="18" width="4" height="8"/>
+      <rect class="outline" x="50" y="26" width="4" height="8"/>
+      <rect class="outline" x="78" y="18" width="4" height="8"/>
+      <rect class="outline" x="74" y="26" width="4" height="8"/>
+      <g filter="url(#softGlow)">
+        <rect class="antenna-light" x="42" y="10" width="10" height="10"/>
+        <rect class="antenna-hot" x="44" y="12" width="6" height="6"/>
+        <rect class="antenna-light" x="76" y="10" width="10" height="10"/>
+        <rect class="antenna-hot" x="78" y="12" width="6" height="6"/>
+      </g>
+      <rect class="outline" x="38" y="32" width="52" height="8"/>
+      <rect class="outline" x="32" y="40" width="64" height="24"/>
+      <rect class="outline" x="38" y="64" width="52" height="8"/>
+      <rect class="body-dark" x="42" y="34" width="44" height="6"/>
+      <rect class="body" x="34" y="42" width="60" height="10"/>
+      <rect class="body-mid" x="34" y="52" width="60" height="10"/>
+      <rect class="body" x="42" y="62" width="44" height="6"/>
+      <!-- standard eyes -->
+      <rect class="eye" x="42" y="47" width="17" height="13"/>
+      <rect class="eye" x="69" y="47" width="17" height="13"/>
+      <rect class="pupil" x="48" y="51" width="6" height="6"/>
+      <rect class="pupil" x="75" y="51" width="6" height="6"/>
+      <rect fill="#f8f8ee" x="50" y="51" width="2" height="2"/>
+      <rect fill="#f8f8ee" x="77" y="51" width="2" height="2"/>
+      <!-- smirk -->
+      <rect class="mouth" x="58" y="63" width="4" height="2"/>
+      <rect class="mouth" x="62" y="65" width="8" height="2"/>
+      <rect class="mouth" x="70" y="63" width="2" height="2"/>
+      <!-- torso -->
+      <rect class="outline" x="44" y="70" width="40" height="8"/>
+      <rect class="outline" x="40" y="78" width="48" height="16"/>
+      <rect class="outline" x="46" y="94" width="36" height="10"/>
+      <rect class="body" x="46" y="72" width="36" height="6"/>
+      <rect class="body-mid" x="42" y="80" width="44" height="12"/>
+      <rect class="body-dark" x="50" y="94" width="28" height="8"/>
+      <g filter="url(#softGlow)">
+        <rect class="belly-shadow" x="52" y="82" width="24" height="18"/>
+        <rect class="belly" x="54" y="80" width="20" height="18"/>
+        <rect fill="#fff0a8" x="58" y="82" width="12" height="8"/>
+      </g>
+      <!-- arms -->
+      <rect class="outline" x="29" y="73" width="10" height="5"/>
+      <rect class="outline" x="89" y="73" width="10" height="5"/>
+      <!-- feet -->
+      <rect class="outline" x="50" y="104" width="10" height="4"/>
+      <rect class="outline" x="68" y="104" width="10" height="4"/>
+    </g>
+  </symbol>
+
+  <!-- SASSY IDLE: smirk, hand on hip, attitude spark -->
+  <symbol id="alf-sassy" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <!-- heavy lids = sassy -->
+    <rect class="outline" x="42" y="43" width="18" height="4"/>
+    <rect class="outline" x="68" y="42" width="18" height="4"/>
+    <!-- attitude spark -->
+    <rect class="coral-el" x="91" y="34" width="4" height="4"/>
+    <rect class="coral-el" x="96" y="29" width="3" height="3"/>
+  </symbol>
+
+  <!-- SIDE-EYE: pupils shifted right, heavy lids, flat mouth -->
+  <symbol id="alf-sideeye" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <rect class="outline" x="42" y="43" width="18" height="6"/>
+    <rect class="outline" x="68" y="43" width="18" height="6"/>
+    <!-- pupils hard right -->
+    <rect class="pupil" x="52" y="51" width="7" height="7"/>
+    <rect class="pupil" x="79" y="51" width="7" height="7"/>
+    <rect fill="#f8f8ee" x="54" y="51" width="2" height="2"/>
+    <rect fill="#f8f8ee" x="81" y="51" width="2" height="2"/>
+    <!-- flat mouth -->
+    <rect class="mouth" x="57" y="63" width="14" height="2"/>
+    <!-- raised left antenna -->
+    <rect class="outline" x="46" y="14" width="4" height="14"/>
+    <rect class="outline" x="42" y="10" width="4" height="6"/>
+    <g filter="url(#softGlow)">
+      <rect class="antenna-light" x="38" y="4" width="10" height="10"/>
+      <rect class="antenna-hot" x="40" y="6" width="6" height="6"/>
+    </g>
+    <!-- "really?" bubble -->
+    <rect fill="#fffefb" x="88" y="28" width="34" height="14"/>
+    <rect fill="#173823" x="88" y="28" width="34" height="1"/>
+    <rect fill="#173823" x="88" y="41" width="34" height="1"/>
+    <rect fill="#173823" x="88" y="28" width="1" height="14"/>
+    <rect fill="#173823" x="121" y="28" width="1" height="14"/>
+    <rect fill="#fffefb" x="90" y="42" width="5" height="3"/>
+    <rect fill="#173823" x="90" y="42" width="5" height="1"/>
+    <rect fill="#173823" x="94" y="42" width="1" height="3"/>
+    <text x="91" y="38" font-family="ui-monospace,monospace" font-size="7" fill="#153828">really?</text>
+  </symbol>
+
+  <!-- ANNOYED: V-brows, both hands on hips, flat mouth -->
+  <symbol id="alf-annoyed" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <!-- angry V brows -->
+    <rect class="outline" x="43" y="46" width="4" height="3"/>
+    <rect class="outline" x="47" y="44" width="4" height="3"/>
+    <rect class="outline" x="51" y="43" width="8" height="3"/>
+    <rect class="outline" x="76" y="43" width="8" height="3"/>
+    <rect class="outline" x="76" y="46" width="4" height="3"/>
+    <rect class="outline" x="80" y="44" width="4" height="3"/>
+    <!-- tight mouth -->
+    <rect class="mouth" x="54" y="63" width="20" height="2"/>
+    <!-- anger vein -->
+    <rect class="coral-el" x="34" y="38" width="3" height="3"/>
+    <rect class="coral-el" x="37" y="35" width="3" height="3"/>
+    <rect class="coral-el" x="34" y="32" width="3" height="3"/>
+    <!-- both arms on hips -->
+    <rect class="outline" x="28" y="70" width="10" height="4"/>
+    <rect class="outline" x="24" y="74" width="6" height="8"/>
+    <rect class="outline" x="24" y="82" width="10" height="4"/>
+    <rect class="outline" x="90" y="70" width="10" height="4"/>
+    <rect class="outline" x="98" y="74" width="6" height="8"/>
+    <rect class="outline" x="94" y="82" width="10" height="4"/>
+  </symbol>
+
+  <!-- DEAD STARE: barely-open eyes, flat mouth, drooping antenna -->
+  <symbol id="alf-deadstare" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <!-- super heavy lids -->
+    <rect class="outline" x="42" y="43" width="18" height="7"/>
+    <rect class="outline" x="68" y="43" width="18" height="7"/>
+    <rect class="body-dark" x="42" y="57" width="17" height="4"/>
+    <rect class="body-dark" x="69" y="57" width="17" height="4"/>
+    <!-- completely flat mouth -->
+    <rect class="mouth" x="54" y="63" width="20" height="2"/>
+    <!-- drooping right antenna -->
+    <rect class="outline" x="78" y="22" width="6" height="4"/>
+    <rect class="outline" x="82" y="26" width="4" height="6"/>
+    <g filter="url(#softGlow)">
+      <rect class="antenna-light" x="80" y="30" width="8" height="8" opacity=".5"/>
+    </g>
+    <!-- "still?" bubble -->
+    <rect fill="#fffefb" x="88" y="30" width="30" height="14"/>
+    <rect fill="#173823" x="88" y="30" width="30" height="1"/>
+    <rect fill="#173823" x="88" y="43" width="30" height="1"/>
+    <rect fill="#173823" x="88" y="30" width="1" height="14"/>
+    <rect fill="#173823" x="117" y="30" width="1" height="14"/>
+    <text x="91" y="40" font-family="ui-monospace,monospace" font-size="7" fill="#153828">still?</text>
+  </symbol>
+
+  <!-- FALLING: tilted, flat annoyed mouth, "ugh." -->
+  <symbol id="alf-falling" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <!-- heavy lids, side-eye, flat mouth -->
+    <rect class="outline" x="42" y="43" width="18" height="6"/>
+    <rect class="outline" x="68" y="43" width="18" height="6"/>
+    <rect class="pupil" x="52" y="51" width="7" height="7"/>
+    <rect class="pupil" x="79" y="51" width="7" height="7"/>
+    <rect fill="#f8f8ee" x="54" y="51" width="2" height="2"/>
+    <rect fill="#f8f8ee" x="81" y="51" width="2" height="2"/>
+    <rect class="mouth" x="55" y="63" width="18" height="2"/>
+    <rect fill="#fffefb" x="88" y="28" width="26" height="12"/>
+    <rect fill="#173823" x="88" y="28" width="26" height="1"/>
+    <rect fill="#173823" x="88" y="39" width="26" height="1"/>
+    <rect fill="#173823" x="88" y="28" width="1" height="12"/>
+    <rect fill="#173823" x="113" y="28" width="1" height="12"/>
+    <text x="91" y="37" font-family="ui-monospace,monospace" font-size="7" fill="#153828">ugh.</text>
+  </symbol>
+
+  <!-- HAPPY/ON-IT: squint eyes, wings up, bright belly -->
+  <symbol id="alf-onit" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <!-- wings up -->
+    <rect class="wing-shadow" x="20" y="38" width="12" height="8"/>
+    <rect class="wing" x="12" y="42" width="24" height="10"/>
+    <rect class="wing-shadow" x="96" y="38" width="12" height="8"/>
+    <rect class="wing" x="92" y="42" width="24" height="10"/>
+    <!-- squint happy eyes -->
+    <rect class="outline" x="42" y="43" width="18" height="4"/>
+    <rect class="outline" x="68" y="43" width="18" height="4"/>
+    <rect class="body-dark" x="42" y="54" width="17" height="6"/>
+    <rect class="body-dark" x="69" y="54" width="17" height="6"/>
+    <!-- happy curve mouth -->
+    <rect class="mouth" x="54" y="60" width="4" height="2"/>
+    <rect class="mouth" x="58" y="62" width="12" height="2"/>
+    <rect class="mouth" x="70" y="60" width="4" height="2"/>
+    <!-- extra bright belly -->
+    <g filter="url(#softGlow)">
+      <rect class="belly-shadow" x="50" y="80" width="28" height="22"/>
+      <rect class="belly" x="52" y="78" width="24" height="22"/>
+      <rect fill="#fff0a8" x="56" y="80" width="16" height="12"/>
+    </g>
+    <!-- sparkles -->
+    <rect class="antenna-light" x="108" y="20" width="6" height="6"/>
+    <rect class="antenna-light" x="116" y="12" width="4" height="4"/>
+    <rect class="coral-el" x="116" y="22" width="4" height="4"/>
+    <!-- arms out -->
+    <rect class="outline" x="26" y="70" width="12" height="4"/>
+    <rect class="outline" x="22" y="74" width="6" height="10"/>
+    <rect class="outline" x="90" y="70" width="12" height="4"/>
+    <rect class="outline" x="100" y="74" width="6" height="10"/>
+  </symbol>
+
+  <!-- CONFUSED: asymmetric brows, wavy mouth, tilted antenna -->
+  <symbol id="alf-confused" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <rect class="outline" x="42" y="43" width="18" height="4"/>
+    <rect class="outline" x="68" y="46" width="18" height="3"/>
+    <!-- wavy mouth -->
+    <rect class="mouth" x="54" y="62" width="4" height="2"/>
+    <rect class="mouth" x="58" y="64" width="4" height="2"/>
+    <rect class="mouth" x="62" y="62" width="4" height="2"/>
+    <rect class="mouth" x="66" y="64" width="4" height="2"/>
+    <rect class="mouth" x="70" y="62" width="4" height="2"/>
+    <!-- tilted right antenna -->
+    <rect class="outline" x="80" y="22" width="8" height="4"/>
+    <rect class="outline" x="84" y="18" width="4" height="6"/>
+    <g filter="url(#softGlow)">
+      <rect class="antenna-light" x="84" y="8" width="10" height="10"/>
+      <rect class="antenna-hot" x="86" y="10" width="6" height="6"/>
+    </g>
+    <!-- question mark -->
+    <rect class="amber-el" x="96" y="28" width="4" height="8"/>
+    <rect class="amber-el" x="100" y="24" width="4" height="4"/>
+    <rect class="amber-el" x="92" y="28" width="4" height="4"/>
+    <rect class="amber-el" x="96" y="38" width="4" height="4"/>
+  </symbol>
+
+  <!-- RUNNING/WHEEL: side-eye, speed lines, "fine." -->
+  <symbol id="alf-running" viewBox="0 0 128 128">
+    <use href="#alf-base"/>
+    <!-- max side-eye -->
+    <rect class="outline" x="42" y="43" width="18" height="6"/>
+    <rect class="outline" x="68" y="43" width="18" height="6"/>
+    <rect class="pupil" x="53" y="51" width="7" height="7"/>
+    <rect class="pupil" x="80" y="51" width="7" height="7"/>
+    <rect fill="#f8f8ee" x="55" y="51" width="2" height="2"/>
+    <rect fill="#f8f8ee" x="82" y="51" width="2" height="2"/>
+    <!-- flat mouth -->
+    <rect class="mouth" x="57" y="63" width="14" height="2"/>
+    <!-- antennae blown back -->
+    <rect class="outline" x="50" y="18" width="4" height="8"/>
+    <rect class="outline" x="54" y="26" width="4" height="8"/>
+    <rect class="outline" x="74" y="18" width="4" height="8"/>
+    <rect class="outline" x="70" y="26" width="4" height="8"/>
+    <!-- speed lines on left -->
+    <rect fill="#b7c99a" x="8" y="48" width="18" height="4"/>
+    <rect fill="#b7c99a" x="4" y="58" width="22" height="4"/>
+    <rect fill="#b7c99a" x="8" y="68" width="18" height="4"/>
+    <!-- "fine." bubble -->
+    <rect fill="#fffefb" x="88" y="30" width="30" height="14"/>
+    <rect fill="#173823" x="88" y="30" width="30" height="1"/>
+    <rect fill="#173823" x="88" y="43" width="30" height="1"/>
+    <rect fill="#173823" x="88" y="30" width="1" height="14"/>
+    <rect fill="#173823" x="117" y="30" width="1" height="14"/>
+    <text x="91" y="40" font-family="ui-monospace,monospace" font-size="7" fill="#153828">fine.</text>
+  </symbol>
+
+</defs>
+</svg>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect x="7" y="0" width="2" height="2" fill="#b7c99a"/>
+        <rect x="6" y="2" width="4" height="2" fill="#b7c99a"/>
+        <rect x="5" y="4" width="6" height="2" fill="#eef2e6"/>
+        <rect x="6" y="6" width="4" height="6" fill="#7d8c4f"/>
+        <rect x="5" y="12" width="6" height="1" fill="#b7c99a"/>
+        <rect x="3" y="13" width="10" height="2" fill="#b7c99a"/>
+      </svg>
+    </div>
+    <span class="logo-text">faro</span>
+  </div>
+  <span class="header-note">early access · waitlist open</span>
+</header>
+
+<div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+<main>
+
+  <!-- SCREEN 1: EMAIL -->
+  <div class="screen active" id="screen-email">
+    <div class="eyebrow">thefarolab · early access</div>
+    <h1 class="screen-title">The analysis part?<br>We got it.</h1>
+    <p class="screen-sub">
+      Faro reads your support queue, finds the patterns, tracks the costs,
+      and tells you what to fix. Automatically, every week.<br><br>
+      Join the waitlist. Your first report is on us.
+    </p>
+    <div class="email-form">
+      <input id="email-input" class="email-input" type="email" placeholder="your@email.com" autocomplete="email" autocapitalize="off"/>
+      <button class="btn-submit" id="btn-email-submit" onclick="submitEmail()">join waitlist →</button>
+    </div>
+    <div class="error-msg" id="email-error">please enter a valid email address</div>
+    <p class="email-note">no spam · no sales calls · unsubscribe anytime</p>
+  </div>
+
+  <!-- SCREEN 2: PAIN POINT -->
+  <div class="screen" id="screen-pain">
+    <div class="eyebrow">quick question · totally optional</div>
+    <h1 class="screen-title">What's bringing you here?</h1>
+    <p class="screen-sub">Same issues every week. Tell us which one hits hardest.</p>
+
+    <div class="cards-outer" id="pain-outer">
+      <!-- Alfaro peeks: LEFT side (for left-col cards) -->
+      <svg id="alfaro-pain-left" class="alfaro-left" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <use href="#alf-sassy"/>
+      </svg>
+      <!-- Alfaro peeks: RIGHT side (for right-col cards) -->
+      <svg id="alfaro-pain-right" class="alfaro-right" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <use href="#alf-sassy"/>
+      </svg>
+
+      <div class="cards" id="cards-pain">
+        <div class="option-card col-left" id="pain_no_visibility" onclick="selectCard(this,'pain')">
+          <div class="card-title">No idea what's happening in my queue</div>
+          <div class="card-sub">Tickets come in. Things get resolved. Maybe.</div>
+        </div>
+        <div class="option-card col-right" id="pain_same_replies" onclick="selectCard(this,'pain')">
+          <div class="card-title">Writing the same replies over and over</div>
+          <div class="card-sub">No macros, no SOPs, just vibes and copy-paste.</div>
+        </div>
+        <div class="option-card col-left" id="pain_falling_through" onclick="selectCard(this,'pain')">
+          <div class="card-title">Issues keep falling through the cracks</div>
+          <div class="card-sub">Escalations go nowhere. Same bugs every week.</div>
+        </div>
+        <div class="option-card col-right" id="pain_boss_report" onclick="selectCard(this,'pain')">
+          <div class="card-title">Boss wants a weekly report. I hate making it.</div>
+          <div class="card-sub">Takes forever. Nobody reads it.</div>
+        </div>
+        <div class="option-card col-left" id="pain_cost_visibility" onclick="selectCard(this,'pain')">
+          <div class="card-title">Need to know what support is actually costing</div>
+          <div class="card-sub">Credits, refunds, time. I feel it but can't prove it.</div>
+        </div>
+        <div class="option-card col-right" id="pain_all_of_above" onclick="selectCard(this,'pain')">
+          <div class="card-title">Honestly... all of the above</div>
+          <div class="card-sub">Yeah. Same.</div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-skip" onclick="skipTo('screen-tool','screen-pain')">skip this →</button>
+      <button class="btn-next" onclick="nextTo('screen-tool')">next →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: TOOL -->
+  <div class="screen" id="screen-tool">
+    <div class="eyebrow">one more · still optional</div>
+    <h1 class="screen-title">What help desk are you using?</h1>
+    <p class="screen-sub">Tells us which integration to build first.</p>
+
+    <div class="cards-outer" id="tool-outer">
+      <div class="cards cards-3" id="cards-tool">
+        <!-- HelpScout -->
+        <div class="option-card col-left" id="tool_helpscout" onclick="selectCard(this,'tool')">
+          <svg class="tool-logo" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1292EE"/>
+            <path d="M16 6C10.477 6 6 10.477 6 16s4.477 10 10 10 10-4.477 10-10S21.523 6 16 6zm-1.5 14.5v-5h3v5h-3zm0-7V11h3v2.5h-3z" fill="white" opacity="0"/>
+            <!-- Beacon / help desk icon -->
+            <circle cx="16" cy="16" r="8" fill="white" opacity="0.15"/>
+            <path d="M10 13h12v1.5H10zm0 3h12v1.5H10zm0 3h8v1.5h-8z" fill="white"/>
+          </svg>
+          <div class="card-title">HelpScout</div>
+          <div class="card-sub">First integration we're building</div>
+        </div>
+
+        <!-- Gmail -->
+        <div class="option-card col-mid" id="tool_gmail" onclick="selectCard(this,'tool')">
+          <svg class="tool-logo" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#fff" stroke="#e8e8e8" stroke-width="1.5"/>
+            <path d="M6 10h20v12a1 1 0 01-1 1H7a1 1 0 01-1-1V10z" fill="#fff"/>
+            <path d="M6 10l10 8 10-8" stroke="#EA4335" stroke-width="2" fill="none"/>
+            <path d="M6 10v12h4V14.5l6 4.5 6-4.5V22h4V10" fill="#fff"/>
+            <path d="M6 10h20" fill="none"/>
+            <!-- M shape Gmail -->
+            <path d="M6 10l10 7.5L26 10H6z" fill="#EA4335"/>
+            <path d="M6 10v12h4.5V15L16 19l5.5-4V22H26V10L16 17.5 6 10z" fill="#4285F4"/>
+          </svg>
+          <div class="card-title">Gmail / shared inbox</div>
+          <div class="card-sub">Coming soon</div>
+        </div>
+
+        <!-- Freshdesk -->
+        <div class="option-card col-right" id="tool_freshdesk" onclick="selectCard(this,'tool')">
+          <svg class="tool-logo" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#25C16F"/>
+            <path d="M10 8h8a6 6 0 016 6v2a6 6 0 01-6 6h-1v4l-4-4H10a6 6 0 01-6-6v-2a6 6 0 016-6z" fill="white" opacity="0.9"/>
+            <circle cx="13" cy="16" r="1.5" fill="#25C16F"/>
+            <circle cx="16" cy="16" r="1.5" fill="#25C16F"/>
+            <circle cx="19" cy="16" r="1.5" fill="#25C16F"/>
+          </svg>
+          <div class="card-title">Freshdesk</div>
+          <div class="card-sub">Coming soon</div>
+        </div>
+
+        <!-- Intercom -->
+        <div class="option-card col-left" id="tool_intercom" onclick="selectCard(this,'tool')">
+          <svg class="tool-logo" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1F8DED"/>
+            <rect x="8" y="9" width="3" height="10" rx="1.5" fill="white"/>
+            <rect x="13" y="7" width="3" height="13" rx="1.5" fill="white"/>
+            <rect x="18" y="9" width="3" height="10" rx="1.5" fill="white"/>
+            <rect x="23" y="11" width="3" height="7" rx="1.5" fill="white"/>
+            <path d="M7 22c2 3 12 3 18 0" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="card-title">Intercom</div>
+          <div class="card-sub">Coming soon</div>
+        </div>
+
+        <!-- Zendesk -->
+        <div class="option-card col-mid" id="tool_zendesk" onclick="selectCard(this,'tool')">
+          <svg class="tool-logo" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#03363D"/>
+            <!-- Z shape -->
+            <path d="M8 9h10l-10 9h10M14 14h10l-10 9h10" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 9h10L8 18h10" fill="none" stroke="#87BFBF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 14h10L14 23h10" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="card-title">Zendesk</div>
+          <div class="card-sub">Coming soon</div>
+        </div>
+
+        <!-- Other -->
+        <div class="option-card col-right" id="tool_other" onclick="selectCard(this,'tool')">
+          <svg class="tool-logo" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#eef2e6"/>
+            <circle cx="10" cy="16" r="2.5" fill="#7d8c4f"/>
+            <circle cx="16" cy="16" r="2.5" fill="#7d8c4f"/>
+            <circle cx="22" cy="16" r="2.5" fill="#7d8c4f"/>
+          </svg>
+          <div class="card-title">Something else</div>
+          <div class="card-sub">We build based on demand</div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-skip" onclick="skipTo('screen-size','screen-tool')">skip this →</button>
+      <button class="btn-next" onclick="nextTo('screen-size')">next →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: TEAM SIZE -->
+  <div class="screen" id="screen-size">
+    <div class="eyebrow">last one · promise · also optional</div>
+    <h1 class="screen-title">What does your team look like?</h1>
+    <p class="screen-sub">Just so Alfaro knows how to talk to you.</p>
+
+    <div class="cards-outer" id="size-outer">
+      <div class="cards cards-3" id="cards-size">
+        <div class="option-card col-left" id="size_solo" onclick="selectCard(this,'size')">
+          <div class="card-title">Just me</div>
+          <div class="card-sub">Support, product, probably also the dishes.</div>
+        </div>
+        <div class="option-card col-mid" id="size_small" onclick="selectCard(this,'size')">
+          <div class="card-title">Small but mighty</div>
+          <div class="card-sub">Me + 1 to 3 agents. Or overwhelmed. Both valid.</div>
+        </div>
+        <div class="option-card col-right" id="size_team" onclick="selectCard(this,'size')">
+          <div class="card-title">A proper team</div>
+          <div class="card-sub">4+ people. We have structure. Mostly.</div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-skip" onclick="finishWaitlist()">skip · finish →</button>
+      <button class="btn-next" onclick="finishWaitlist()">done →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: THANK YOU -->
+  <div class="screen" id="screen-thanks">
+    <div class="thankyou thankyou-composed">
+      <section class="thankyou-hero">
+        <div class="thankyou-celebration" aria-label="Alfaro is celebrating">
+          <span class="pixel-confetti c1" aria-hidden="true"></span>
+          <span class="pixel-confetti c2" aria-hidden="true"></span>
+          <span class="pixel-confetti c3" aria-hidden="true"></span>
+          <span class="pixel-confetti c4" aria-hidden="true"></span>
+          <svg class="celebration-faro" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">
+            <use href="#alf-onit"/>
+          </svg>
+        </div>
+        <div class="thankyou-copy">
+          <div class="thankyou-title-row">
+            <h2>You're in.</h2>
+          </div>
+          <p>We'll email you when Faro is ready to run your first report.</p>
+          <p>No card. No pitch call. Just the report.</p>
+          <div class="waitlist-pill">
+            <div class="pill-dot"></div>
+            <span id="waitlist-count-text">you're one of the early ones.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="founder-note" aria-label="Note from Jazmin">
+        <div class="note-pin note-pin-left"></div>
+        <div class="note-pin note-pin-right"></div>
+        <div class="notepad-header">
+          <div class="notepad-person">
+            <img src="https://raw.githubusercontent.com/gusfrava/faro-frontend/main/pixel-jazmin.png" class="notepad-avatar" alt="Pixel portrait of Jazmin Mejia"/>
+            <div>
+              <div class="notepad-name">A note from Jazmin</div>
+              <div class="notepad-title">founder, TheFaroLab · built from support ops</div>
+            </div>
+          </div>
+          <div class="notepad-mark">faro</div>
+        </div>
+        <div class="notepad-body">
+          <p class="notepad-text">Thanks for joining Faro's waitlist.</p>
+          <p class="notepad-text">I'm building Faro for small teams that need a clearer picture of what support keeps repeating, what is quietly slipping through the cracks, and what is worth fixing before it becomes normal.</p>
+          <p class="notepad-text">Your first report will focus on the useful parts: recurring issues, repeated work, stale FAQs, missing macros, and the gaps that keep showing up across support.</p>
+          <p class="notepad-text">The goal is simple: less noise, more clarity, and a better sense of what actually needs attention.</p>
+          <p class="notepad-text notepad-closing">No fluff. Just the parts worth fixing.</p>
+          <div class="notepad-sig">
+            <img src="https://raw.githubusercontent.com/gusfrava/faro-frontend/main/jazmin-signature-transparent.png" class="sig-img" alt="Jazmin Mejia signature"/>
+          </div>
+        </div>
+      </section>
+
+      <!-- Share section -->
+      <div class="share-section">
+        <p class="share-label">Want to share Faro?</p>
+        <div class="share-row">
+          <button class="share-btn" onclick="copyLink()" id="copy-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            copy link
+          </button>
+          <div class="share-actions">
+            <button class="share-btn share-icon-btn" id="share-toggle" type="button" onclick="toggleShareMenu(event)" aria-haspopup="true" aria-expanded="false" aria-controls="share-menu" aria-label="Share Faro" title="Share Faro">
+              <img class="share-icon-img" src="https://raw.githubusercontent.com/gusfrava/faro-frontend/main/share-pixel-arrow.png" alt="" aria-hidden="true"/>
+            </button>
+            <div class="share-menu" id="share-menu" role="menu">
+              <a class="share-btn" role="menuitem" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fthefarolab.com" target="_blank" rel="noopener">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4v15h-4V8zM8 8h3.8v2.05h.05c.53-1 1.84-2.05 3.78-2.05 4.04 0 4.79 2.66 4.79 6.12V23h-4v-7.87c0-1.88-.03-4.29-2.61-4.29-2.62 0-3.02 2.04-3.02 4.15V23H8V8z"/></svg>
+                LinkedIn
+              </a>
+              <a class="share-btn" role="menuitem" href="https://twitter.com/intent/tweet?text=I%20just%20joined%20the%20waitlist%20for%20Faro%20%E2%80%94%20it%20reads%20your%20support%20queue%20and%20turns%20repeating%20support%20issues%20into%20a%20useful%20first%20report.&url=https%3A%2F%2Fthefarolab.com" target="_blank" rel="noopener">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.257 5.626zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                X
+              </a>
+              <a class="share-btn" role="menuitem" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fthefarolab.com" target="_blank" rel="noopener">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 8.5V6.25c0-.62.5-1.12 1.12-1.12H17V1.5h-3.04A4.46 4.46 0 009.5 5.96V8.5H6.5V12h3v10.5H14V12h3l.5-3.5H14z"/></svg>
+                Facebook
+              </a>
+              <a class="share-btn" role="menuitem" href="https://wa.me/?text=I%20joined%20the%20waitlist%20for%20Faro%20%E2%80%94%20it%20turns%20repeating%20support%20issues%20into%20a%20useful%20first%20report.%20https%3A%2F%2Fthefarolab.com" target="_blank" rel="noopener">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.52 3.48A11.9 11.9 0 0012.06 0C5.46 0 .1 5.36.1 11.96c0 2.1.55 4.15 1.6 5.96L0 24l6.22-1.63a11.93 11.93 0 005.84 1.49h.01c6.6 0 11.96-5.36 11.96-11.96 0-3.2-1.25-6.2-3.51-8.42zM12.07 21.84h-.01a9.9 9.9 0 01-5.04-1.38l-.36-.21-3.69.97.98-3.6-.23-.37a9.88 9.88 0 01-1.51-5.29c0-5.49 4.47-9.95 9.96-9.95a9.9 9.9 0 017.04 2.91 9.9 9.9 0 012.91 7.04c0 5.49-4.47 9.88-10.05 9.88zm5.46-7.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.2 5.08 4.49.71.31 1.27.49 1.7.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z"/></svg>
+                WhatsApp
+              </a>
+              <a class="share-btn" role="menuitem" href="mailto:?subject=Faro%20waitlist&body=I%20joined%20the%20waitlist%20for%20Faro.%20It%20turns%20repeating%20support%20issues%20into%20a%20useful%20first%20report%3A%20https%3A%2F%2Fthefarolab.com">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 5h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="currentColor" stroke-width="2"/><path d="M22 7l-10 6L2 7" stroke="currentColor" stroke-width="2"/></svg>
+                Email
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</main>
+
+<footer>faro by TheFaroLab · info@thefarolab.com · Santo Domingo, DR 🇩🇴</footer>
+
+<script>
+const SUPABASE_URL = 'https://wtahdncbwkzwszqrpcep.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_kfv_OoeEFDn0_tStQ421AQ_W4V2Sy_M';
+
+const state = {
+  email:null, pain_point:null, tool:null, team_size:null,
+  submitted_at:null, source:document.referrer||'direct', _id:null
+};
+
+// ── ALFARO VARIANT MAPPING ─────────────────────────
+// Which Alfaro symbol to show for each card id
+const alfaroMap = {
+  pain_no_visibility:  'alf-sassy',
+  pain_same_replies:   'alf-running',
+  pain_falling_through:'alf-falling',
+  pain_boss_report:    'alf-deadstare',
+  pain_cost_visibility:'alf-sideeye',
+  pain_all_of_above:   'alf-annoyed',
+  tool_helpscout:      'alf-onit',
+  tool_gmail:          'alf-sassy',
+  tool_freshdesk:      'alf-sassy',
+  tool_intercom:       'alf-sassy',
+  tool_zendesk:        'alf-sassy',
+  tool_other:          'alf-confused',
+  size_solo:           'alf-sassy',
+  size_small:          'alf-onit',
+  size_team:           'alf-confused',
+};
+
+// ── HOVER: show Alfaro from correct edge ───────────
+function setupHovers() {
+  // Only pain screen cards get Alfaro hover
+  document.querySelectorAll('#cards-pain .option-card').forEach(card => {
+    const outer = card.closest('.cards-outer');
+    if (!outer) return;
+    const isLeft  = card.classList.contains('col-left');
+    const isRight = card.classList.contains('col-right');
+    const isMid   = card.classList.contains('col-mid');
+    const leftSvg  = outer.querySelector('.alfaro-left');
+    const rightSvg = outer.querySelector('.alfaro-right');
+
+    card.addEventListener('mouseenter', () => {
+      const variant = alfaroMap[card.id] || 'alf-sassy';
+
+      // Position Alfaro vertically to match THIS card's center
+      const outerRect = outer.getBoundingClientRect();
+      const cardRect  = card.getBoundingClientRect();
+      const cardCenterY = cardRect.top - outerRect.top + cardRect.height / 2;
+
+      if (isLeft && leftSvg) {
+        leftSvg.querySelector('use').setAttribute('href', '#'+variant);
+        // Alfaro center aligns with card center
+        leftSvg.style.top = (cardCenterY - 55) + 'px';
+        leftSvg.style.transform = 'none';
+        leftSvg.classList.add('show');
+        if (rightSvg) rightSvg.classList.remove('show');
+      } else if ((isRight || isMid) && rightSvg) {
+        rightSvg.querySelector('use').setAttribute('href', '#'+variant);
+        rightSvg.style.top = (cardCenterY - 55) + 'px';
+        rightSvg.style.transform = 'scaleX(-1)';
+        rightSvg.classList.add('show');
+        if (leftSvg) leftSvg.classList.remove('show');
+      }
+    });
+
+    card.addEventListener('mouseleave', () => {
+      if (leftSvg)  leftSvg.classList.remove('show');
+      if (rightSvg) rightSvg.classList.remove('show');
+    });
+  });
+}
+
+// ── TRACKING ───────────────────────────────────────
+function track(event, props={}) {
+  try { if (window.posthog) window.posthog.capture(event, props); } catch(e){}
+}
+
+// ── EMAIL SUBMIT ───────────────────────────────────
+async function submitEmail() {
+  const input = document.getElementById('email-input');
+  const err   = document.getElementById('email-error');
+  const btn   = document.getElementById('btn-email-submit');
+  const email = input.value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    input.classList.add('error'); err.classList.add('show'); return;
+  }
+  input.classList.remove('error'); err.classList.remove('show');
+  state.email = email; state.submitted_at = new Date().toISOString();
+  btn.textContent='saving...'; btn.disabled=true;
+  await insertSupabase();
+  track('waitlist_email_submitted', {email, source:state.source});
+  goTo('screen-pain', 50);
+  btn.textContent='join waitlist →'; btn.disabled=false;
+}
+
+// ── CARD SELECT ────────────────────────────────────
+function selectCard(card, group) {
+  card.parentElement.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  const key = group==='pain'?'pain_point':group==='tool'?'tool':'team_size';
+  state[key] = card.id;
+  track('waitlist_option_selected', {group, selected_id:card.id, email:state.email});
+}
+
+// ── NAV ────────────────────────────────────────────
+function nextTo(toScreen) { updateSupabase(); goTo(toScreen, progressFor(toScreen)); }
+function skipTo(toScreen, fromScreen) {
+  track('waitlist_question_skipped', {skipped_screen:fromScreen, email:state.email});
+  goTo(toScreen, progressFor(toScreen));
+}
+function finishWaitlist() {
+  updateSupabase();
+  track('waitlist_completed', {email:state.email, pain_point:state.pain_point, tool:state.tool, team_size:state.team_size});
+  goTo('screen-thanks', 100); fetchCount();
+}
+function goTo(id, pct) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+function progressFor(id) {
+  return {'screen-email':25,'screen-pain':50,'screen-tool':75,'screen-size':88,'screen-thanks':100}[id]||25;
+}
+
+// ── SUPABASE ───────────────────────────────────────
+async function insertSupabase() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_KEY,
+        'Authorization':`Bearer ${SUPABASE_KEY}`,
+        'Prefer':'return=representation'
+      },
+      body:JSON.stringify({email:state.email, submitted_at:state.submitted_at, source:state.source})
+    });
+    const data = await res.json();
+    if (data?.[0]?.id) state._id = data[0].id;
+  } catch(e){ console.warn('Supabase insert:',e); }
+}
+async function updateSupabase() {
+  if (!state._id) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/waitlist?id=eq.${state._id}`, {
+      method:'PATCH',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_KEY,
+        'Authorization':`Bearer ${SUPABASE_KEY}`
+      },
+      body:JSON.stringify({pain_point:state.pain_point, tool:state.tool, team_size:state.team_size})
+    });
+  } catch(e){ console.warn('Supabase update:',e); }
+}
+async function fetchCount() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist?select=id`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'count=exact','Range':'0-0'}
+    });
+    const total = res.headers.get('content-range')?.split('/')[1];
+    if (total && parseInt(total)>0)
+      document.getElementById('waitlist-count-text').textContent=`${total} people on the list so far.`;
+  } catch(e){}
+}
+
+// ── COPY LINK ──────────────────────────────────────
+function copyLink() {
+  navigator.clipboard.writeText('https://thefarolab.com').then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ copied!';
+    setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/></svg> copy link'; }, 2000);
+  }).catch(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'thefarolab.com';
+  });
+}
+
+function toggleShareMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById('share-menu');
+  const toggle = document.getElementById('share-toggle');
+  const isOpen = menu.classList.toggle('show');
+  toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function closeShareMenu() {
+  const menu = document.getElementById('share-menu');
+  const toggle = document.getElementById('share-toggle');
+  if (!menu || !toggle) return;
+  menu.classList.remove('show');
+  toggle.setAttribute('aria-expanded', 'false');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.share-actions')) closeShareMenu();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeShareMenu();
+});
+
+// ── INIT ───────────────────────────────────────────
+document.getElementById('email-input').addEventListener('keydown', e=>{ if(e.key==='Enter') submitEmail(); });
+track('waitlist_page_viewed', {source:state.source});
+setupHovers();
+
+// Pre-fill email from URL param and auto-submit if present
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const emailParam = params.get('email');
+  if (emailParam) {
+    document.getElementById('email-input').value = emailParam;
+    // Auto-submit so they skip straight to Q1
+    await submitEmail();
+  }
+})();
+</script>
+</body>
+</html>
