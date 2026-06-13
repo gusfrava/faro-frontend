@@ -1097,6 +1097,18 @@ function track(event, props={}) {
   insertEvent(event, props);
 }
 
+function identifyUser(email) {
+  try {
+    if (window.posthog && email) {
+      posthog.identify(email, { email });
+    }
+  } catch(e){}
+}
+
+function groupLabel(group) {
+  return group === 'pain' ? 'pain_point' : group === 'tool' ? 'helpdesk_tool' : 'team_size';
+}
+
 // ── EMAIL SUBMIT ───────────────────────────────────
 async function submitEmail() {
   const input = document.getElementById('email-input');
@@ -1117,7 +1129,14 @@ async function submitEmail() {
     btn.textContent='join waitlist →'; btn.disabled=false;
     return;
   }
-  track('waitlist_email_submitted', {email, source:state.source, status:insertResult.status});
+  identifyUser(email);
+  track('waitlist_email_submitted', {
+    email,
+    source:state.source,
+    status:insertResult.status,
+    step:'email',
+    step_label:'Email submitted'
+  });
   goTo('screen-pain', 50);
   btn.textContent='join waitlist →'; btn.disabled=false;
 }
@@ -1128,10 +1147,14 @@ function selectCard(card, group) {
   card.classList.add('selected');
   const key = group==='pain'?'pain_point':group==='tool'?'tool':'team_size';
   state[key] = card.id;
+  const selectedLabel = card.querySelector('.card-title')?.textContent?.trim() || card.id;
   track('waitlist_option_selected', {
     group,
+    step:groupLabel(group),
+    step_label:groupLabel(group).replace('_',' '),
     selected_id:card.id,
-    option_label:card.querySelector('.card-title')?.textContent?.trim() || card.id,
+    selected_label:selectedLabel,
+    option_label:selectedLabel,
     email:state.email
   });
 }
@@ -1143,7 +1166,14 @@ function skipTo(toScreen, fromScreen) {
   goTo(toScreen, progressFor(toScreen));
 }
 function finishWaitlist() {
-  track('waitlist_completed', {email:state.email, pain_point:state.pain_point, tool:state.tool, team_size:state.team_size});
+  track('waitlist_completed', {
+    email:state.email,
+    step:'completed',
+    step_label:'Waitlist completed',
+    pain_point:state.pain_point,
+    tool:state.tool,
+    team_size:state.team_size
+  });
   goTo('screen-thanks', 100); fetchCount();
 }
 function goTo(id, pct) {
