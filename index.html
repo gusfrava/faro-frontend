@@ -1000,12 +1000,25 @@ footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;fo
 <script>
 const SUPABASE_URL = 'https://wtahdncbwkzwszqrpcep.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_kfv_OoeEFDn0_tStQ421AQ_W4V2Sy_M';
-  
+
 const state = {
   email:null, pain_point:null, tool:null, team_size:null,
   submitted_at:null, source:document.referrer||'direct', _id:null,
   session_id:(window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`)
 };
+
+function supabaseHeaders(extra={}) {
+  const headers = {
+    'Content-Type':'application/json',
+    'apikey':SUPABASE_KEY,
+    ...extra
+  };
+  // Legacy anon JWT keys can be used as Bearer tokens. New sb_publishable keys should not.
+  if (!SUPABASE_KEY.startsWith('sb_publishable_')) {
+    headers.Authorization = `Bearer ${SUPABASE_KEY}`;
+  }
+  return headers;
+}
 
 // ── ALFARO VARIANT MAPPING ─────────────────────────
 // Which Alfaro symbol to show for each card id
@@ -1091,7 +1104,7 @@ async function submitEmail() {
   btn.textContent='saving...'; btn.disabled=true;
   const insertResult = await insertSupabase();
   if (!insertResult.ok) {
-    err.textContent = 'could not save your email. please try again.';
+    err.textContent = insertResult.message || 'could not save your email. please try again.';
     err.classList.add('show');
     btn.textContent='join waitlist →'; btn.disabled=false;
     return;
@@ -1139,12 +1152,7 @@ async function insertSupabase() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':SUPABASE_KEY,
-        'Authorization':`Bearer ${SUPABASE_KEY}`,
-        'Prefer':'return=minimal'
-      },
+      headers:supabaseHeaders({'Prefer':'return=minimal'}),
       body:JSON.stringify({email:state.email, submitted_at:state.submitted_at, source:state.source})
     });
     if (res.ok) return {ok:true,status:'new'};
@@ -1156,10 +1164,15 @@ async function insertSupabase() {
       return {ok:true,status:'already_in'};
     }
     console.warn('Supabase insert failed:', res.status, error);
-    return {ok:false,status:'failed',error};
+    return {
+      ok:false,
+      status:'failed',
+      error,
+      message:error.message ? `Supabase: ${error.message}` : `Supabase request failed (${res.status})`
+    };
   } catch(e){
     console.warn('Supabase insert:',e);
-    return {ok:false,status:'failed',error:e};
+    return {ok:false,status:'failed',error:e,message:`Supabase: ${e.message || 'network error'}`};
   }
 }
 async function updateSupabase() {
@@ -1169,12 +1182,7 @@ async function insertEvent(eventName, props={}) {
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/waitlist_events`, {
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':SUPABASE_KEY,
-        'Authorization':`Bearer ${SUPABASE_KEY}`,
-        'Prefer':'return=minimal'
-      },
+      headers:supabaseHeaders({'Prefer':'return=minimal'}),
       body:JSON.stringify({
         email:state.email || props.email || null,
         session_id:state.session_id,
@@ -1194,7 +1202,7 @@ async function insertEvent(eventName, props={}) {
 async function fetchCount() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist?select=id`,{
-      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'count=exact','Range':'0-0'}
+      headers:supabaseHeaders({'Prefer':'count=exact','Range':'0-0'})
     });
     const total = res.headers.get('content-range')?.split('/')[1];
     if (total && parseInt(total)>0)
