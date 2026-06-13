@@ -1,1 +1,754 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faro Games</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'><rect width='32' height='32' rx='6' fill='%232d6a4f'/><rect x='14' y='2' width='4' height='4' fill='%23b7c99a'/><rect x='12' y='6' width='8' height='4' fill='%23b7c99a'/><rect x='10' y='10' width='12' height='4' fill='%23eef2e6'/><rect x='12' y='14' width='8' height='10' fill='%237d8c4f'/><rect x='10' y='24' width='12' height='2' fill='%23b7c99a'/><rect x='6' y='26' width='20' height='4' fill='%23b7c99a'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dark:#2d6a4f;--mid:#7d8c4f;--light:#b7c99a;
+  --tint:#eef2e6;--cream:#faf8f4;--white:#fffefb;
+  --text:#1c2b1e;--muted:#6b7f6e;--border:#d4e0c8;
+  --coral:#e07b54;--amber:#c4933f;--outline:#173823;--glow:#ffd84d;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+.already{text-align:center;padding:48px 24px;max-width:680px;margin:0 auto;}
+.already h2{font-size:28px;font-weight:700;color:var(--dark);margin-bottom:8px;letter-spacing:-.5px;}
+.already p{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:32px;}
+.game-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+.game-card{background:var(--white);border:2px solid var(--border);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all .15s;text-align:center;}
+.game-card:hover{border-color:var(--dark);background:var(--tint);transform:translateY(-2px);}
+.game-card-icon{font-size:28px;margin-bottom:10px;}
+.game-card-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dark);margin-bottom:6px;line-height:1.6;}
+.game-card-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.5;}
+.game-wrap{display:none;flex-direction:column;align-items:center;padding:24px;}
+.game-wrap.active{display:flex;}
+.game-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:480px;margin-bottom:12px;}
+.game-title{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--dark);}
+.game-score{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);}
+.back-btn{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:4px 8px;}
+.back-btn:hover{color:var(--dark);}
+canvas{border:2px solid var(--border);border-radius:12px;background:var(--white);display:block;image-rendering:pixelated;}
+.game-controls{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:10px;text-align:center;}
+.game-canvas-wrap{position:relative;}
+.game-over-overlay{display:none;position:absolute;inset:0;background:rgba(28,43,30,.88);border-radius:12px;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.game-over-overlay.show{display:flex;}
+.go-title{font-family:'Press Start 2P',monospace;font-size:11px;color:#fff;text-align:center;line-height:1.8;}
+.go-score{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--light);text-align:center;}
+.go-btn{font-family:'Press Start 2P',monospace;font-size:8px;background:var(--coral);color:#fff;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;margin-top:4px;}
+.go-btn:hover{background:#c9693e;}
+.power-msg{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--glow);margin-top:6px;text-align:center;min-height:16px;}
+</style>
+<script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="rn sn init kn Qr wn Cn yn capture calculateEventProperties Rn register register_once register_for_session unregister unregister_for_session An getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync Fn identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags reset resetIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty On En createPersonProfile setInternalOrTestUser Ln gn $n opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing In debug Kr Pn getPageViewId captureTraceFeedback captureTraceMetric vn".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_sy2ztGAX93z4D6mvbTtt42NmTBM6Vkhz4AgFVHfaYoki', {
+        api_host: 'https://us.i.posthog.com',
+        defaults: '2026-05-30',
+        person_profiles: 'identified_only',
+    })
+</script>
+</head>
+<body>
+
+<div class="already" id="screen-already">
+  <div style="margin-bottom:16px;">
+    <svg width="80" height="80" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <rect fill="#dfe8d7" opacity=".72" x="14" y="50" width="26" height="10"/>
+      <rect fill="#dfe8d7" opacity=".72" x="88" y="50" width="26" height="10"/>
+      <rect fill="#173823" x="46" y="18" width="4" height="8"/><rect fill="#173823" x="50" y="26" width="4" height="8"/>
+      <rect fill="#173823" x="78" y="18" width="4" height="8"/><rect fill="#173823" x="74" y="26" width="4" height="8"/>
+      <rect fill="#ffd84d" x="42" y="10" width="10" height="10"/><rect fill="#fff0a8" x="44" y="12" width="6" height="6"/>
+      <rect fill="#ffd84d" x="76" y="10" width="10" height="10"/><rect fill="#fff0a8" x="78" y="12" width="6" height="6"/>
+      <rect fill="#173823" x="38" y="32" width="52" height="8"/>
+      <rect fill="#173823" x="32" y="40" width="64" height="24"/>
+      <rect fill="#173823" x="38" y="64" width="52" height="8"/>
+      <rect fill="#153828" x="42" y="34" width="44" height="6"/>
+      <rect fill="#2d6a4f" x="34" y="42" width="60" height="10"/>
+      <rect fill="#3f7a56" x="34" y="52" width="60" height="10"/>
+      <rect fill="#173823" x="42" y="43" width="18" height="4"/><rect fill="#173823" x="68" y="42" width="18" height="4"/>
+      <rect fill="#f8f8ee" x="42" y="47" width="17" height="13"/><rect fill="#f8f8ee" x="69" y="47" width="17" height="13"/>
+      <rect fill="#101c14" x="48" y="51" width="6" height="6"/><rect fill="#101c14" x="75" y="51" width="6" height="6"/>
+      <rect fill="#f8f8ee" x="50" y="51" width="2" height="2"/><rect fill="#f8f8ee" x="77" y="51" width="2" height="2"/>
+      <rect fill="#101c14" x="58" y="63" width="4" height="2"/><rect fill="#101c14" x="62" y="65" width="8" height="2"/>
+      <rect fill="#e07b54" x="91" y="34" width="4" height="4"/><rect fill="#e07b54" x="96" y="29" width="3" height="3"/>
+      <rect fill="#173823" x="44" y="70" width="40" height="8"/><rect fill="#173823" x="40" y="78" width="48" height="16"/><rect fill="#173823" x="46" y="94" width="36" height="10"/>
+      <rect fill="#2d6a4f" x="46" y="72" width="36" height="6"/><rect fill="#3f7a56" x="42" y="80" width="44" height="12"/>
+      <rect fill="#ffd84d" x="54" y="80" width="20" height="18"/><rect fill="#fff0a8" x="58" y="82" width="12" height="8"/>
+      <rect fill="#173823" x="50" y="104" width="10" height="4"/><rect fill="#173823" x="68" y="104" width="10" height="4"/>
+    </svg>
+  </div>
+  <h2>You're already in. 🌟</h2>
+  <p>Alfaro remembers you. While you wait for your first report —<br>pick your poison.</p>
+  <div class="game-picker">
+    <div class="game-card" onclick="startGame('bugseason')">
+      <div class="game-card-icon">🐛</div>
+      <div class="game-card-name">Bug Season</div>
+      <div class="game-card-desc">Catch bugs before they become tickets. Grab the lighthouse for power-ups.</div>
+    </div>
+    <div class="game-card" onclick="startGame('whacker')">
+      <div class="game-card-icon">🎫</div>
+      <div class="game-card-name">Ticket Whacker 3000</div>
+      <div class="game-card-desc">Whack tickets before your boss sees them</div>
+    </div>
+    <div class="game-card" onclick="startGame('queue')">
+      <div class="game-card-icon">🔁</div>
+      <div class="game-card-name">The Eternal Queue</div>
+      <div class="game-card-desc">It never ends. Just like support.</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 1: BUG SEASON -->
+<div class="game-wrap" id="game-bugseason">
+  <div class="game-header" style="max-width:400px;">
+    <button class="back-btn" onclick="backToMenu()">← back</button>
+    <span class="game-title">Bug Season</span>
+    <span class="game-score">score: <span id="bs-score">0</span></span>
+  </div>
+  <div class="game-canvas-wrap">
+    <canvas id="canvas-bugseason" width="400" height="500"></canvas>
+    <div class="game-over-overlay" id="bs-over">
+      <div class="go-title">bug got through.<br>it's now a ticket.</div>
+      <div class="go-score" id="bs-final">score: 0</div>
+      <button class="go-btn" onclick="initBugSeason()">try again →</button>
+      <button class="back-btn" style="color:#b7c99a;margin-top:4px;" onclick="backToMenu()">pick another game</button>
+    </div>
+  </div>
+  <div class="power-msg" id="bs-power-msg"></div>
+  <div class="game-controls">← → to move · catch bugs · grab 🏠 lighthouse for power-ups · miss 3 = game over</div>
+</div>
+
+<!-- GAME 2: TICKET WHACKER 3000 -->
+<div class="game-wrap" id="game-whacker">
+  <div class="game-header" style="max-width:400px;">
+    <button class="back-btn" onclick="backToMenu()">← back</button>
+    <span class="game-title">Ticket Whacker 3000</span>
+    <span class="game-score">score: <span id="tw-score">0</span></span>
+  </div>
+  <div class="game-canvas-wrap">
+    <canvas id="canvas-whacker" width="400" height="400"></canvas>
+    <div class="game-over-overlay" id="tw-over">
+      <div class="go-title">time's up.<br>tickets win. again.</div>
+      <div class="go-score" id="tw-final">score: 0</div>
+      <button class="go-btn" onclick="initWhacker()">try again →</button>
+      <button class="back-btn" style="color:#b7c99a;margin-top:4px;" onclick="backToMenu()">pick another game</button>
+    </div>
+  </div>
+  <div class="game-controls">click tickets to whack them · 30 seconds · don't let them pile up</div>
+</div>
+
+<!-- GAME 3: THE ETERNAL QUEUE -->
+<div class="game-wrap" id="game-queue">
+  <div class="game-header" style="max-width:480px;">
+    <button class="back-btn" onclick="backToMenu()">← back</button>
+    <span class="game-title">The Eternal Queue</span>
+    <span class="game-score">dist: <span id="eq-score">0</span>m</span>
+  </div>
+  <div class="game-canvas-wrap">
+    <canvas id="canvas-queue" width="480" height="280"></canvas>
+    <div class="game-over-overlay" id="eq-over">
+      <div class="go-title">hit a ticket.<br>the queue always wins.</div>
+      <div class="go-score" id="eq-final">0m survived</div>
+      <button class="go-btn" onclick="initQueue()">run again →</button>
+      <button class="back-btn" style="color:#b7c99a;margin-top:4px;" onclick="backToMenu()">pick another game</button>
+    </div>
+  </div>
+  <div class="game-controls">space / tap to jump · avoid the tickets · it never ends</div>
+</div>
+
+<script>
+// ── NAV ──────────────────────────────────────────────
+let activeGame=null;
+const gameParams=new URLSearchParams(window.location.search);
+const gameEmail=sessionStorage.getItem('faro_duplicate_email') || gameParams.get('email') || '';
+const gameSource=sessionStorage.getItem('faro_games_source') || gameParams.get('from') || 'direct';
+const gameLabels={bugseason:'Bug Season',whacker:'Ticket Whacker 3000',queue:'The Eternal Queue'};
+
+function trackGame(event, props={}) {
+  const payload={email:gameEmail || null, source:gameSource, ...props};
+  try { if (window.posthog) window.posthog.capture(event, payload); } catch(e){}
+}
+
+function identifyGameUser() {
+  try {
+    if (window.posthog && gameEmail) posthog.identify(gameEmail, {email:gameEmail});
+  } catch(e){}
+}
+
+function finishGame(gameId, score, unit='points') {
+  trackGame('game_finished', {
+    game_id:gameId,
+    game_name:gameLabels[gameId],
+    score,
+    unit
+  });
+}
+
+function startGame(n){
+  document.getElementById('screen-already').style.display='none';
+  document.querySelectorAll('.game-wrap').forEach(g=>g.classList.remove('active'));
+  document.getElementById('game-'+n).classList.add('active');
+  activeGame=n;
+  trackGame('game_started', {game_id:n, game_name:gameLabels[n]});
+  stopAll();
+  if(n==='bugseason') initBugSeason();
+  if(n==='whacker')   initWhacker();
+  if(n==='queue')     initQueue();
+}
+function backToMenu(){
+  stopAll();
+  document.querySelectorAll('.game-wrap').forEach(g=>g.classList.remove('active'));
+  document.getElementById('screen-already').style.display='block';
+  activeGame=null;
+}
+let bsRunning=false,twRunning=false,eqRunning=false;
+function stopAll(){bsRunning=false;twRunning=false;eqRunning=false;}
+
+identifyGameUser();
+trackGame('game_picker_viewed', {game_count:3});
+
+// ── SHARED DRAW ──────────────────────────────────────
+const C={dark:'#2d6a4f',mid:'#7d8c4f',light:'#b7c99a',tint:'#eef2e6',cream:'#faf8f4',
+  white:'#fffefb',coral:'#e07b54',amber:'#c4933f',outline:'#173823',glow:'#ffd84d',
+  muted:'#6b7f6e',border:'#d4e0c8'};
+
+function px(ctx,x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h);}
+
+// Alfaro at given px size (scale factor s)
+function drawAlfaro(ctx,x,y,s=2,expr='idle'){
+  x=Math.round(x);y=Math.round(y);
+  // shadow
+  ctx.fillStyle='rgba(23,56,35,.12)';ctx.beginPath();
+  ctx.ellipse(x+8*s,y+30*s,9*s,3,0,0,Math.PI*2);ctx.fill();
+  // wings
+  ctx.globalAlpha=.65;
+  px(ctx,x-3*s,y+10*s,5*s,4*s,C.light);
+  px(ctx,x+14*s,y+10*s,5*s,4*s,C.light);
+  ctx.globalAlpha=1;
+  // antennae stems
+  px(ctx,x+5*s,y,2*s,4*s,C.outline);
+  px(ctx,x+10*s,y,2*s,4*s,C.outline);
+  // glow tips
+  px(ctx,x+4*s,y-2*s,4*s,3*s,C.glow);
+  px(ctx,x+9*s,y-2*s,4*s,3*s,C.glow);
+  // head
+  px(ctx,x+2*s,y+4*s,13*s,10*s,C.outline);
+  px(ctx,x+3*s,y+5*s,11*s,8*s,C.dark);
+  px(ctx,x+4*s,y+6*s,9*s,6*s,'#3f7a56');
+  // eyes
+  px(ctx,x+3*s,y+6*s,4*s,4*s,'#f8f8ee');
+  px(ctx,x+10*s,y+6*s,4*s,4*s,'#f8f8ee');
+  if(expr==='sideeye'){
+    px(ctx,x+5*s,y+7*s,2*s,2*s,C.outline);
+    px(ctx,x+12*s,y+7*s,2*s,2*s,C.outline);
+    px(ctx,x+3*s,y+9*s,4*s,2*s,'#3f7a56');
+    px(ctx,x+10*s,y+9*s,4*s,2*s,'#3f7a56');
+    px(ctx,x+5*s,y+11*s,7*s,1*s,C.outline);
+  }else if(expr==='happy'){
+    px(ctx,x+4*s,y+7*s,2*s,2*s,C.outline);
+    px(ctx,x+11*s,y+7*s,2*s,2*s,C.outline);
+    px(ctx,x+3*s,y+9*s,4*s,3*s,'#3f7a56');
+    px(ctx,x+10*s,y+9*s,4*s,3*s,'#3f7a56');
+    px(ctx,x+4*s,y+11*s,9*s,2*s,C.outline);
+  }else{
+    px(ctx,x+4*s,y+7*s,2*s,2*s,C.outline);
+    px(ctx,x+11*s,y+7*s,2*s,2*s,C.outline);
+    px(ctx,x+6*s,y+11*s,2*s,1*s,C.outline);
+    px(ctx,x+8*s,y+12*s,3*s,1*s,C.outline);
+  }
+  // body
+  px(ctx,x+2*s,y+14*s,13*s,12*s,C.outline);
+  px(ctx,x+3*s,y+15*s,11*s,10*s,C.dark);
+  px(ctx,x+4*s,y+16*s,9*s,8*s,'#3f7a56');
+  // belly glow
+  px(ctx,x+5*s,y+17*s,7*s,6*s,C.glow);
+  px(ctx,x+6*s,y+18*s,5*s,4*s,'#fff0a8');
+  // feet
+  px(ctx,x+4*s,y+26*s,4*s,2*s,C.outline);
+  px(ctx,x+10*s,y+26*s,4*s,2*s,C.outline);
+}
+
+// Pixel bug (12×10)
+function drawBug(ctx,x,y){
+  x=Math.round(x);y=Math.round(y);
+  px(ctx,x+3,y,6,3,C.coral);
+  px(ctx,x,y+3,12,5,C.coral);
+  px(ctx,x+4,y+8,4,3,C.coral);
+  px(ctx,x+1,y+4,3,3,'#fff');
+  px(ctx,x+8,y+4,3,3,'#fff');
+  px(ctx,x+2,y+5,2,2,C.outline);
+  px(ctx,x+9,y+5,2,2,C.outline);
+  // legs
+  ctx.strokeStyle=C.outline;ctx.lineWidth=1.5;
+  [[x,y+3,x-6,y],[x,y+6,x-6,y+9],[x+12,y+3,x+18,y],[x+12,y+6,x+18,y+9]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  });
+}
+
+// Lighthouse power-up (14×20 pixels)
+function drawLighthouse(ctx,x,y){
+  x=Math.round(x);y=Math.round(y);
+  // glow aura
+  ctx.globalAlpha=.2;
+  ctx.fillStyle=C.glow;ctx.beginPath();
+  ctx.arc(x+7,y+4,12,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  // beacon
+  px(ctx,x+4,y,6,6,C.glow);
+  px(ctx,x+5,y+1,4,4,'#fff0a8');
+  // tower
+  px(ctx,x+5,y+6,4,10,C.dark);
+  px(ctx,x+4,y+6,6,2,'#173823');
+  px(ctx,x+4,y+10,6,2,'#173823');
+  // base
+  px(ctx,x+2,y+16,10,4,C.mid);
+  px(ctx,x+0,y+18,14,2,C.dark);
+  // light rays
+  ctx.strokeStyle='rgba(255,216,77,0.6)';ctx.lineWidth=1.5;
+  [[-12,-8],[-14,0],[-10,8],[12,-8],[14,0],[10,8]].forEach(([dx,dy])=>{
+    ctx.beginPath();ctx.moveTo(x+7,y+3);ctx.lineTo(x+7+dx,y+3+dy);ctx.stroke();
+  });
+}
+
+// Pixel ticket obstacle
+function drawTicketObstacle(ctx,x,y,w,h,label,priority='med'){
+  const borderCol=priority==='high'?C.coral:priority==='low'?C.mid:C.amber;
+  px(ctx,x,y,w,h,'#fffefb');
+  ctx.strokeStyle=borderCol;ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,h-2);
+  px(ctx,x,y,w,4,borderCol);
+  ctx.fillStyle=C.muted;ctx.font='7px DM Mono,monospace';
+  ctx.fillText(label,x+3,y+h-6);
+  // priority dot
+  ctx.fillStyle=borderCol;ctx.beginPath();
+  ctx.arc(x+w-8,y+10,3,0,Math.PI*2);ctx.fill();
+}
+
+
+// ═══════════════════════════════════════
+// GAME 1: BUG SEASON (FIXED)
+// ═══════════════════════════════════════
+let bsCtx,bsAnim,bsAlf,bsBugs,bsPowerups,bsScore,bsMissed,bsTick,bsLastPowerScore;
+let bsPowered=false,bsPowerTimer=0,bsSpeed;
+
+function initBugSeason(){
+  const cv=document.getElementById('canvas-bugseason');
+  bsCtx=cv.getContext('2d');
+  document.getElementById('bs-over').classList.remove('show');
+  document.getElementById('bs-score').textContent='0';
+  document.getElementById('bs-power-msg').textContent='';
+  const W=400,H=500;
+  bsAlf={x:W/2-18,y:H-126,w:36,h:56};
+  bsBugs=[];bsPowerups=[];
+  bsScore=0;bsMissed=0;bsTick=0;bsSpeed=1.2;
+  bsLastPowerScore=0;
+  bsPowered=false;bsPowerTimer=0;
+  bsRunning=true;
+  cancelAnimationFrame(bsAnim);
+  requestAnimationFrame(bsFrame);
+}
+
+function bsFrame(){
+  if(!bsRunning)return;
+  const ctx=bsCtx,W=400,H=500;
+  ctx.clearRect(0,0,W,H);
+
+  // bg
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,C.tint);g.addColorStop(1,C.cream);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  // ground
+  px(ctx,0,H-50,W,50,C.tint);
+  ctx.strokeStyle=C.border;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,H-50);ctx.lineTo(W,H-50);ctx.stroke();
+
+  bsTick++;
+  // speed increases over time
+  bsSpeed=Math.min(5.8,1.15+bsScore*0.035+bsTick*0.0014);
+
+  // spawn bugs — keep them readable, then let speed create the pressure.
+  const lastBug=bsBugs.length?bsBugs[bsBugs.length-1]:null;
+  const minGap=Math.max(112,155-bsTick*0.01);
+  const spawnRate=Math.max(42,98-Math.floor(bsTick/420));
+  if(bsTick%spawnRate===0 && (!lastBug||lastBug.y>minGap)){
+    const usedX=bsBugs.map(b=>b.x);
+    let nx,tries=0;
+    do{nx=30+Math.random()*(W-60);tries++;}
+    while(usedX.some(ux=>Math.abs(ux-nx)<74)&&tries<10);
+    bsBugs.push({x:nx,y:-12,speed:bsSpeed+(Math.random()*0.5),w:12,h:10});
+  }
+
+  // spawn lighthouse power-up every 10 catches, once per milestone
+  if(bsScore>=10&&bsScore%10===0&&bsScore!==bsLastPowerScore&&bsPowerups.length===0){
+    bsLastPowerScore=bsScore;
+    bsPowerups.push({x:40+Math.random()*(W-80),y:-24,speed:1.2,w:14,h:20});
+  }
+
+  // power-up timer
+  if(bsPowered){
+    bsPowerTimer--;
+    if(bsPowerTimer<=0){bsPowered=false;document.getElementById('bs-power-msg').textContent='';}
+  }
+
+  // move + draw bugs
+  const catchBox={x:bsAlf.x-8,y:bsAlf.y+8,w:52,h:54};
+  for(let i=bsBugs.length-1;i>=0;i--){
+    bsBugs[i].y+=bsBugs[i].speed;
+    const b=bsBugs[i];
+    drawBug(ctx,b.x,b.y);
+
+    // catch when the bug overlaps Alfaro's visible body, not the ground.
+    if(b.x+12>catchBox.x&&b.x<catchBox.x+catchBox.w&&
+       b.y+10>catchBox.y&&b.y<catchBox.y+catchBox.h){
+      bsBugs.splice(i,1);
+      bsScore+=bsPowered?2:1;
+      document.getElementById('bs-score').textContent=bsScore;
+      // catch flash
+      ctx.fillStyle='rgba(255,216,77,.2)';ctx.fillRect(0,0,W,H);
+      continue;
+    }
+    // missed
+    if(b.y>H){
+      bsBugs.splice(i,1);
+      if(!bsPowered){
+        bsMissed++;
+        if(bsMissed>=3){
+          bsRunning=false;
+          document.getElementById('bs-final').textContent='score: '+bsScore;
+          document.getElementById('bs-over').classList.add('show');
+          finishGame('bugseason', bsScore);
+          return;
+        }
+      }
+    }
+  }
+
+  // move + draw powerups
+  for(let i=bsPowerups.length-1;i>=0;i--){
+    bsPowerups[i].y+=bsPowerups[i].speed;
+    const p=bsPowerups[i];
+    drawLighthouse(ctx,p.x,p.y);
+    // catch lighthouse
+    if(p.x+14>catchBox.x&&p.x<catchBox.x+catchBox.w&&
+       p.y+20>catchBox.y&&p.y<catchBox.y+catchBox.h){
+      bsPowerups.splice(i,1);
+      bsPowered=true;bsPowerTimer=300;
+      document.getElementById('bs-power-msg').textContent='⚡ LIGHTHOUSE POWER! double points + shield ⚡';
+      // clear all bugs on screen as bonus
+      bsBugs=[];
+      continue;
+    }
+    if(p.y>H)bsPowerups.splice(i,1);
+  }
+
+  // miss indicators
+  for(let m=0;m<3;m++){
+    px(ctx,10+m*24,10,18,18,m<bsMissed?'#fdf0ec':C.tint);
+    ctx.strokeStyle=m<bsMissed?C.coral:C.border;ctx.lineWidth=1.5;
+    ctx.strokeRect(10+m*24+.5,10.5,17,17);
+    if(m<bsMissed){ctx.fillStyle=C.coral;ctx.font='11px DM Mono,monospace';ctx.fillText('✗',14+m*24,23);}
+  }
+  ctx.fillStyle=C.muted;ctx.font='8px DM Mono,monospace';ctx.fillText('misses',10,42);
+
+  // speed indicator
+  ctx.fillStyle=C.mid;ctx.font='7px DM Mono,monospace';
+  ctx.fillText('spd:'+(bsSpeed).toFixed(1),W-70,20);
+
+  // Alfaro — powered = glowing outline
+  if(bsPowered){
+    ctx.shadowColor=C.glow;ctx.shadowBlur=16;
+  }
+  const expr=bsMissed===2?'sideeye':bsScore>10?'happy':'idle';
+  drawAlfaro(ctx,bsAlf.x,bsAlf.y,2,expr);
+  ctx.shadowBlur=0;
+
+  bsAnim=requestAnimationFrame(bsFrame);
+}
+
+// Bug Season controls
+const bsKeys={};
+document.addEventListener('keydown',e=>{
+  bsKeys[e.key]=true;
+  if(e.key==='ArrowLeft'&&bsRunning)bsAlf.x=Math.max(4,bsAlf.x-14);
+  if(e.key==='ArrowRight'&&bsRunning)bsAlf.x=Math.min(364,bsAlf.x+14);
+});
+document.addEventListener('keyup',e=>{delete bsKeys[e.key];});
+setInterval(()=>{
+  if(!bsRunning)return;
+  if(bsKeys['ArrowLeft'])bsAlf.x=Math.max(4,bsAlf.x-6);
+  if(bsKeys['ArrowRight'])bsAlf.x=Math.min(364,bsAlf.x+6);
+},16);
+document.getElementById('canvas-bugseason').addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const r=e.target.getBoundingClientRect();
+  bsAlf.x=Math.min(364,Math.max(4,e.touches[0].clientX-r.left-18));
+},{passive:false});
+
+
+// ═══════════════════════════════════════
+// GAME 2: TICKET WHACKER 3000
+// ═══════════════════════════════════════
+let twCtx,twAnim,twScore,twTimeLeft,twTimer,twTick,twRunning2;
+const HOLES=[];
+for(let r=0;r<3;r++)for(let c=0;c<3;c++)
+  HOLES.push({x:34+c*118,y:55+r*108,active:false,timer:0,whacked:false,wTimer:0,label:'',priority:'med'});
+
+const TK_LABELS=['#3421 — no macro','#1098 — missing SLA','#2234 — stale FAQ','#0091 — same reply x5',
+  '#4402 — no owner','#3310 — week 4','#2201 — wrong FAQ','#1111 — unresolved'];
+const TK_PRI=['high','high','med','med','low','high','med','low'];
+
+function initWhacker(){
+  const cv=document.getElementById('canvas-whacker');
+  twCtx=cv.getContext('2d');
+  document.getElementById('tw-over').classList.remove('show');
+  document.getElementById('tw-score').textContent='0';
+  twScore=0;twTimeLeft=30;twTick=0;twRunning=true;
+  HOLES.forEach(h=>{h.active=false;h.timer=0;h.whacked=false;h.wTimer=0;});
+  clearInterval(twTimer);
+  twTimer=setInterval(()=>{
+    twTimeLeft--;
+    if(twTimeLeft<=0){
+      clearInterval(twTimer);twRunning=false;
+      document.getElementById('tw-final').textContent='score: '+twScore;
+      document.getElementById('tw-over').classList.add('show');
+      finishGame('whacker', twScore);
+    }
+  },1000);
+  cancelAnimationFrame(twAnim);
+  twAnim=requestAnimationFrame(twFrame);
+}
+
+function twFrame(){
+  if(!twRunning){cancelAnimationFrame(twAnim);return;}
+  const ctx=twCtx,W=400,H=400;
+  ctx.clearRect(0,0,W,H);
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,C.tint);g.addColorStop(1,C.cream);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  twTick++;
+
+  // adaptive spawn rate — faster as time runs out
+  const spawnRate=Math.max(20,45-(30-twTimeLeft));
+  const inactive=HOLES.filter(h=>!h.active&&!h.whacked);
+  if(inactive.length>0&&twTick%spawnRate===0){
+    const h=inactive[Math.floor(Math.random()*inactive.length)];
+    const idx=Math.floor(Math.random()*TK_LABELS.length);
+    h.active=true;h.label=TK_LABELS[idx];h.priority=TK_PRI[idx];
+    h.timer=Math.max(30,70-twScore*2);
+  }
+
+  // timer bar
+  const barW=(twTimeLeft/30)*360;
+  px(ctx,20,12,360,6,C.border);
+  px(ctx,20,12,Math.max(0,barW),6,twTimeLeft>10?C.dark:C.coral);
+  ctx.fillStyle=C.muted;ctx.font='8px DM Mono,monospace';
+  ctx.fillText(twTimeLeft+'s',368,20);
+  ctx.fillStyle=C.dark;ctx.font='8px Press Start 2P,monospace';
+  ctx.fillText('score: '+twScore,20,35);
+
+  HOLES.forEach(h=>{
+    // hole shadow
+    ctx.fillStyle='rgba(23,56,35,.1)';ctx.beginPath();
+    ctx.ellipse(h.x+34,h.y+80,36,9,0,0,Math.PI*2);ctx.fill();
+
+    if(h.whacked){
+      h.wTimer--;
+      ctx.fillStyle='rgba(224,123,84,.15)';ctx.fillRect(h.x,h.y,68,84);
+      ctx.fillStyle=C.coral;ctx.font='bold 14px DM Sans,sans-serif';ctx.fillText('+1',h.x+24,h.y+42);
+      if(h.wTimer<=0)h.whacked=false;
+    }else if(h.active){
+      h.timer--;
+      drawTicketObstacle(ctx,h.x+2,h.y+6,64,72,h.label,h.priority);
+      // urgency pulse when about to expire
+      if(h.timer<18&&Math.floor(twTick/3)%2===0){
+        ctx.strokeStyle=C.coral;ctx.lineWidth=2.5;
+        ctx.strokeRect(h.x+1.5,h.y+5.5,65,73);
+      }
+      if(h.timer<=0)h.active=false;
+    }else{
+      ctx.fillStyle=C.border;ctx.beginPath();
+      ctx.ellipse(h.x+34,h.y+44,30,7,0,0,Math.PI*2);ctx.fill();
+    }
+  });
+
+  // Alfaro watching
+  drawAlfaro(ctx,320,285,1.6,'sideeye');
+  ctx.fillStyle=C.muted;ctx.font='7px DM Mono,monospace';ctx.fillText('still watching.',314,378);
+
+  twAnim=requestAnimationFrame(twFrame);
+}
+
+document.getElementById('canvas-whacker').addEventListener('click',e=>{
+  if(!twRunning)return;
+  const r=e.target.getBoundingClientRect();
+  const mx=e.clientX-r.left,my=e.clientY-r.top;
+  HOLES.forEach(h=>{
+    if(h.active&&mx>h.x+2&&mx<h.x+66&&my>h.y+6&&my<h.y+78){
+      h.active=false;h.whacked=true;h.wTimer=22;
+      twScore++;document.getElementById('tw-score').textContent=twScore;
+    }
+  });
+});
+document.getElementById('canvas-whacker').addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const r=e.target.getBoundingClientRect();
+  const mx=e.touches[0].clientX-r.left,my=e.touches[0].clientY-r.top;
+  HOLES.forEach(h=>{
+    if(h.active&&mx>h.x+2&&mx<h.x+66&&my>h.y+6&&my<h.y+78){
+      h.active=false;h.whacked=true;h.wTimer=22;
+      twScore++;document.getElementById('tw-score').textContent=twScore;
+    }
+  });
+},{passive:false});
+
+
+// ═══════════════════════════════════════
+// GAME 3: THE ETERNAL QUEUE (FIXED)
+// ═══════════════════════════════════════
+let eqCtx,eqAnim,eqAlf,eqObstacles,eqDist,eqTick,eqSpeed,eqGround;
+let eqJumping,eqVY,eqDoubleJump;
+
+// Obstacle types themed on real support issues
+const EQ_OBS=[
+  {label:'missing\nmacro',  w:32,color:C.amber, priority:'med'},
+  {label:'no SLA\nset',     w:28,color:C.coral, priority:'high'},
+  {label:'stale\nFAQ',      w:36,color:C.mid,   priority:'low'},
+  {label:'week 4\nagain',   w:30,color:C.coral, priority:'high'},
+  {label:'no\nowner',       w:28,color:C.amber, priority:'med'},
+  {label:'same\nreply',      w:34,color:C.amber, priority:'med'},
+  {label:'cost\nleak',       w:30,color:C.coral, priority:'high'},
+  {label:'lost\nbug',        w:28,color:C.mid,   priority:'low'},
+  {label:'UNREAD\n×23',     w:40,color:C.coral, priority:'high'},
+];
+
+function initQueue(){
+  const cv=document.getElementById('canvas-queue');
+  eqCtx=cv.getContext('2d');
+  document.getElementById('eq-over').classList.remove('show');
+  document.getElementById('eq-score').textContent='0';
+  eqGround=220;
+  eqAlf={x:60,y:eqGround-60,w:36,h:60};
+  eqObstacles=[];
+  eqDist=0;eqTick=0;eqSpeed=1.45;eqRunning=true;
+  eqJumping=false;eqVY=0;eqDoubleJump=false;
+  addQueueObstacle(360);
+  cancelAnimationFrame(eqAnim);
+  eqAnim=requestAnimationFrame(eqFrame);
+}
+
+function addQueueObstacle(x){
+  const t=EQ_OBS[Math.floor(Math.random()*EQ_OBS.length)];
+  const h=26+Math.floor(Math.random()*28);
+  eqObstacles.push({x,y:eqGround-h,w:t.w,h,label:t.label,color:t.color,priority:t.priority});
+}
+
+function eqJump(){
+  if(!eqRunning)return;
+  if(!eqJumping){eqJumping=true;eqVY=-12;eqDoubleJump=true;}
+  else if(eqDoubleJump){eqVY=-10;eqDoubleJump=false;}// double jump
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'&&activeGame==='queue'){e.preventDefault();eqJump();}
+});
+document.getElementById('canvas-queue').addEventListener('click',eqJump);
+document.getElementById('canvas-queue').addEventListener('touchstart',e=>{
+  e.preventDefault();eqJump();
+},{passive:false});
+
+function eqFrame(){
+  if(!eqRunning)return;
+  const ctx=eqCtx,W=480,H=280;
+  ctx.clearRect(0,0,W,H);
+
+  // sky gradient
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#e6ede0');sky.addColorStop(1,C.cream);
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+
+  // scrolling bg elements (faint dashes)
+  const dashOff=(eqTick*eqSpeed*0.3)%60;
+  ctx.strokeStyle='rgba(212,224,200,0.4)';ctx.lineWidth=1;ctx.setLineDash([30,30]);
+  ctx.beginPath();ctx.moveTo(-dashOff,eqGround-80);ctx.lineTo(W,eqGround-80);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ground
+  px(ctx,0,eqGround,W,H-eqGround,C.tint);
+  ctx.strokeStyle=C.border;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,eqGround);ctx.lineTo(W,eqGround);ctx.stroke();
+
+  eqTick++;
+  eqDist=Math.floor(eqTick/6);
+  // speed ramp: gentle start, clearly faster over time.
+  eqSpeed=Math.min(7.6,1.45+eqDist*0.022);
+  document.getElementById('eq-score').textContent=eqDist;
+
+  // spawn obstacles — gap decreases with speed
+  const minGap=Math.max(132,280-eqDist*1.65);
+  const lastObs=eqObstacles.length?eqObstacles[eqObstacles.length-1]:null;
+  if(!lastObs||lastObs.x<W-minGap){
+    addQueueObstacle(W);
+    if(eqDist>45&&Math.random()<0.22){
+      addQueueObstacle(W+52);
+    }
+  }
+
+  // draw + move obstacles
+  for(let i=eqObstacles.length-1;i>=0;i--){
+    eqObstacles[i].x-=eqSpeed;
+    const o=eqObstacles[i];
+    // ticket body
+    px(ctx,o.x,o.y,o.w,o.h,'#fffefb');
+    ctx.strokeStyle=o.color;ctx.lineWidth=2;ctx.strokeRect(o.x+1,o.y+1,o.w-2,o.h-2);
+    px(ctx,o.x,o.y,o.w,4,o.color);
+    // label (multi-line)
+    ctx.fillStyle=C.muted;ctx.font='6px DM Mono,monospace';
+    o.label.split('\n').forEach((line,li)=>ctx.fillText(line,o.x+3,o.y+o.h-12+li*8));
+
+    // collision — tight hitbox
+    if(eqAlf.x+eqAlf.w-10>o.x+4&&eqAlf.x+10<o.x+o.w-4&&
+       eqAlf.y+eqAlf.h-6>o.y&&eqAlf.y+6<o.y+o.h){
+      eqRunning=false;
+      document.getElementById('eq-final').textContent=eqDist+'m survived';
+      document.getElementById('eq-over').classList.add('show');
+      finishGame('queue', eqDist, 'meters');
+      return;
+    }
+    if(o.x+o.w<0)eqObstacles.splice(i,1);
+  }
+
+  // gravity + jump
+  if(eqJumping){
+    eqVY+=0.6;
+    eqAlf.y+=eqVY;
+    if(eqAlf.y>=eqGround-eqAlf.h){
+      eqAlf.y=eqGround-eqAlf.h;
+      eqJumping=false;eqVY=0;eqDoubleJump=false;
+    }
+  }
+
+  // draw Alfaro
+  const expr=eqJumping?'happy':eqDist>20?'sideeye':'idle';
+  drawAlfaro(ctx,eqAlf.x,eqAlf.y,1.8,expr);
+
+  // HUD
+  ctx.fillStyle=C.dark;ctx.font='7px Press Start 2P,monospace';
+  ctx.fillText(eqDist+'m',W-60,20);
+  ctx.fillStyle=C.muted;ctx.font='7px DM Mono,monospace';
+  ctx.fillText('spd: '+(eqSpeed).toFixed(1),W-60,34);
+
+  // ground dashes
+  const gDash=(eqTick*eqSpeed)%50;
+  ctx.strokeStyle=C.border;ctx.lineWidth=1;ctx.setLineDash([25,25]);
+  ctx.beginPath();ctx.moveTo(-gDash,eqGround+8);ctx.lineTo(W,eqGround+8);ctx.stroke();
+  ctx.setLineDash([]);
+
+  eqAnim=requestAnimationFrame(eqFrame);
+}
+</script>
+</body>
+</html>
