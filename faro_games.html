@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faro Games</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'><rect width='32' height='32' rx='6' fill='%232d6a4f'/><rect x='14' y='2' width='4' height='4' fill='%23b7c99a'/><rect x='12' y='6' width='8' height='4' fill='%23b7c99a'/><rect x='10' y='10' width='12' height='4' fill='%23eef2e6'/><rect x='12' y='14' width='8' height='10' fill='%237d8c4f'/><rect x='10' y='24' width='12' height='2' fill='%23b7c99a'/><rect x='6' y='26' width='20' height='4' fill='%23b7c99a'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -162,11 +163,12 @@ canvas{border:2px solid var(--border);border-radius:12px;background:var(--white)
 // ── NAV ──────────────────────────────────────────────
 let activeGame=null;
 const gameParams=new URLSearchParams(window.location.search);
-const gameEmail=gameParams.get('email') || '';
+const gameEmail=sessionStorage.getItem('faro_duplicate_email') || gameParams.get('email') || '';
+const gameSource=sessionStorage.getItem('faro_games_source') || gameParams.get('from') || 'direct';
 const gameLabels={bugseason:'Bug Season',whacker:'Ticket Whacker 3000',queue:'The Eternal Queue'};
 
 function trackGame(event, props={}) {
-  const payload={email:gameEmail || null, source:gameParams.get('from') || 'direct', ...props};
+  const payload={email:gameEmail || null, source:gameSource, ...props};
   try { if (window.posthog) window.posthog.capture(event, payload); } catch(e){}
 }
 
