@@ -1080,14 +1080,21 @@ async function submitEmail() {
   const err   = document.getElementById('email-error');
   const btn   = document.getElementById('btn-email-submit');
   const email = input.value.trim();
+  err.textContent = 'please enter a valid email address';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     input.classList.add('error'); err.classList.add('show'); return;
   }
   input.classList.remove('error'); err.classList.remove('show');
   state.email = email; state.submitted_at = new Date().toISOString();
   btn.textContent='saving...'; btn.disabled=true;
-  await insertSupabase();
-  track('waitlist_email_submitted', {email, source:state.source});
+  const insertResult = await insertSupabase();
+  if (!insertResult.ok) {
+    err.textContent = 'could not save your email. please try again.';
+    err.classList.add('show');
+    btn.textContent='join waitlist →'; btn.disabled=false;
+    return;
+  }
+  track('waitlist_email_submitted', {email, source:state.source, status:insertResult.status});
   goTo('screen-pain', 50);
   btn.textContent='join waitlist →'; btn.disabled=false;
 }
@@ -1130,18 +1137,29 @@ async function insertSupabase() {
         'Content-Type':'application/json',
         'apikey':SUPABASE_KEY,
         'Authorization':`Bearer ${SUPABASE_KEY}`,
-        'Prefer':'return=representation'
+        'Prefer':'return=minimal'
       },
       body:JSON.stringify({email:state.email, submitted_at:state.submitted_at, source:state.source})
     });
-    const data = await res.json();
-    if (data?.[0]?.id) state._id = data[0].id;
-  } catch(e){ console.warn('Supabase insert:',e); }
+    if (res.ok) return {ok:true,status:'new'};
+
+    const text = await res.text();
+    let error = {};
+    try { error = JSON.parse(text); } catch(e) { error = {message:text}; }
+    if (res.status === 409 || error.code === '23505') {
+      return {ok:true,status:'already_in'};
+    }
+    console.warn('Supabase insert failed:', res.status, error);
+    return {ok:false,status:'failed',error};
+  } catch(e){
+    console.warn('Supabase insert:',e);
+    return {ok:false,status:'failed',error:e};
+  }
 }
 async function updateSupabase() {
-  if (!state._id) return;
+  if (!state.email) return;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/waitlist?id=eq.${state._id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/waitlist?email=eq.${encodeURIComponent(state.email)}`, {
       method:'PATCH',
       headers:{
         'Content-Type':'application/json',
