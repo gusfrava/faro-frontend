@@ -49,8 +49,15 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 
 .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
 .email-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;}
 .email-note::before{content:'→ ';color:var(--light);}
-  .consent-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6;max-width:430px;}
+  .consent-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:20px;line-height:1.6;max-width:430px;}
   .consent-note a{color:var(--dark);text-decoration:underline;}
+  .legal-note{display:flex;gap:14px;align-items:flex-start;background:#eaf0dd;border:1px solid var(--light);border-radius:12px;padding:16px 18px;margin-top:20px;max-width:560px;}
+  .legal-note img{width:56px;height:56px;flex-shrink:0;}
+  .legal-note .ln-title{font-family:'DM Sans',sans-serif;font-weight:700;color:var(--dark);font-size:14px;margin-bottom:5px;}
+  .legal-note p{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);line-height:1.6;margin:0 0 5px;}
+  .legal-note p:last-child{margin-bottom:0;}
+  .legal-note a{color:var(--dark);text-decoration:underline;}
+  .legal-note .ln-wink{color:var(--muted);font-style:italic;}
   footer a{color:var(--dark);text-decoration:underline;}
 .error-msg{font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);margin-top:4px;display:none;}
 .error-msg.show{display:block;}
@@ -724,8 +731,7 @@ footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;fo
     <div class="eyebrow">thefarolab · early access</div>
     <h1 class="screen-title">The analysis part?<br>We got it.</h1>
     <p class="screen-sub">
-      Faro reads your support queue, finds the patterns, tracks the costs,
-      and tells you what to fix. Automatically, every week.<br><br>
+      Faro finds the patterns, costs, and support gaps worth fixing.<br><br>
       Join the waitlist. Your first report is on us.
     </p>
     <div class="email-form">
@@ -733,8 +739,14 @@ footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;fo
       <button class="btn-submit" id="btn-email-submit" onclick="submitEmail()">join waitlist →</button>
     </div>
     <div class="error-msg" id="email-error">please enter a valid email address</div>
-    <p class="email-note">no spam · no sales calls · unsubscribe anytime</p>
-    <p class="consent-note">By joining, you agree to Faro's <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>. No third-party cookies. No ad trackers. No nonsense.</p>
+    <div class="legal-note">
+      <img src="https://raw.githubusercontent.com/gusfrava/faro-frontend/main/alfaro-lawyer.png" width="56" height="56" alt="Alfaro the firefly dressed as a tiny lawyer">
+      <div class="ln-body">
+        <div class="ln-title">Tiny legal note</div>
+        <p>By joining, you agree to Faro's <a href="/terms">Terms</a> and <a href="/privacy-policy">Privacy Policy</a>. No sales calls. No ad trackers.</p>
+        <p class="ln-wink">Alfaro has a briefcase now, so we're taking this very seriously.</p>
+      </div>
+    </div>
   </div>
 
   <!-- SCREEN 2: PAIN POINT -->
@@ -1007,7 +1019,7 @@ footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;fo
 
 </main>
 
-<footer>faro by TheFaroLab · <a href="mailto:info@thefarolab.com">info@thefarolab.com</a> · Santo Domingo, DR 🇩🇴 · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></footer>
+<footer>faro by TheFaroLab · <a href="mailto:info@thefarolab.com">info@thefarolab.com</a> · Santo Domingo, DR 🇩🇴 · <a href="/terms">Terms</a> · <a href="/privacy-policy">Privacy</a></footer>
 
 <script>
 const SUPABASE_URL = 'https://wtahdncbwkzwszqrpcep.supabase.co';
