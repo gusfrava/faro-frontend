@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy · faro</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'><rect width='32' height='32' rx='6' fill='%232d6a4f'/><rect x='14' y='2' width='4' height='4' fill='%23b7c99a'/><rect x='12' y='6' width='8' height='4' fill='%23b7c99a'/><rect x='10' y='10' width='12' height='4' fill='%23eef2e6'/><rect x='12' y='14' width='8' height='10' fill='%237d8c4f'/><rect x='10' y='24' width='12' height='2' fill='%23b7c99a'/><rect x='6' y='26' width='20' height='4' fill='%23b7c99a'/></svg>">
+<style>
+  :root{
+    --dark:#2d6a4f;--mid:#7d8c4f;--light:#b7c99a;
+    --tint:#eef2e6;--cream:#faf8f4;--white:#fffefb;
+    --text:#1c2b1e;--muted:#6b7f6e;--border:#d4e0c8;
+    --coral:#e07b54;--amber:#c4933f;--outline:#173823;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.6;}
+  a{color:var(--dark);}
+  header{padding:18px 32px;background:var(--white);border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo-mark{width:28px;height:28px;background:var(--dark);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+  .logo-text{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--dark);}
+  .header-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:48px 24px 64px;}
+  .back{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-decoration:none;display:inline-block;margin-bottom:28px;}
+  .back:hover{color:var(--dark);}
+  h1{font-size:38px;font-weight:700;color:var(--text);letter-spacing:-1px;line-height:1.1;margin-bottom:10px;}
+  h1 .accent{color:var(--coral);font-style:italic;}
+  .updated{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:28px;}
+  .lede{font-size:17px;color:var(--text);margin-bottom:10px;}
+  .lede-sub{font-size:15px;color:var(--muted);margin-bottom:28px;}
+  .callout{border:1.5px solid var(--border);background:var(--white);border-radius:12px;padding:20px 22px;margin:18px 0;}
+  .callout.warn{border-color:var(--coral);}
+  .callout-label{font-weight:700;color:var(--dark);font-size:15px;margin-bottom:8px;}
+  .callout.warn .callout-label{color:var(--coral);}
+  .callout p{font-size:14px;color:var(--text);margin-bottom:8px;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout ul{list-style:none;padding:0;margin:0;}
+  .callout li{font-size:14px;color:var(--text);padding:4px 0 4px 18px;position:relative;}
+  .callout li::before{content:'·';position:absolute;left:4px;color:var(--light);font-weight:700;}
+  h2{font-size:24px;font-weight:700;color:var(--dark);margin:40px 0 6px;letter-spacing:-.5px;}
+  .section-note{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:18px;}
+  h3{font-size:16px;font-weight:700;color:var(--text);margin:24px 0 6px;}
+  section p{font-size:15px;color:var(--text);margin-bottom:6px;}
+  footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  footer a{color:var(--dark);text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect x="7" y="0" width="2" height="2" fill="#b7c99a"/>
+        <rect x="6" y="2" width="4" height="2" fill="#b7c99a"/>
+        <rect x="5" y="4" width="6" height="2" fill="#eef2e6"/>
+        <rect x="6" y="6" width="4" height="6" fill="#7d8c4f"/>
+        <rect x="5" y="12" width="6" height="1" fill="#b7c99a"/>
+        <rect x="3" y="13" width="10" height="2" fill="#b7c99a"/>
+      </svg>
+    </div>
+    <span class="logo-text">faro</span>
+  </a>
+  <span class="header-note">early access · waitlist open</span>
+</header>
+
+<main>
+  <a href="/" class="back">← back to faro</a>
+
+  <h1>Privacy, <span class="accent">faro style</span></h1>
+  <p class="updated">Last updated: [set the date when you publish]. faro is operated by TheFaroLab.</p>
+
+  <p class="lede">We are not trying to build a surveillance machine. We just need enough data to make faro work.</p>
+  <p class="lede-sub">Below is the short version in plain English. The fuller version is underneath.</p>
+
+  <div class="callout warn">
+    <div class="callout-label">Read this first</div>
+    <p>This is the short version. If something changes, we will update this page instead of pretending nobody reads it. This is not legal advice, and we will likely have a lawyer review it before faro leaves beta.</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Short version</div>
+    <ul>
+      <li>We collect your email when you join the waitlist.</li>
+      <li>We may collect your name, company, role, help desk tool, survey answers, and referral source.</li>
+      <li>We may track basic first-party site events, like page views, clicks, and waitlist form activity.</li>
+      <li>We may store UTM parameters and referrer data to understand where signups come from.</li>
+      <li>When faro connects to a help desk, access is read-only unless we clearly say otherwise.</li>
+      <li>We use support data to generate reports and product insights for the customer.</li>
+      <li>You can ask us to delete your data.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Stuff we do not do</div>
+    <ul>
+      <li>No mystery pixels.</li>
+      <li>No creepy retargeting.</li>
+      <li>No selling your data.</li>
+      <li>No third-party ad cookies or tracking pixels.</li>
+      <li>We do not use a customer's support data to advertise to that customer's own users.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Stuff we do need</div>
+    <ul>
+      <li>Your email, so we can tell you when faro is ready.</li>
+      <li>A few optional survey answers, so we build something useful instead of guessing.</li>
+      <li>Basic, first-party usage signals, so we know which parts of the page actually work.</li>
+      <li>With your connection, read-only support data, so we can build your report. Read-only means read-only.</li>
+    </ul>
+  </div>
+
+  <h2>The fuller version</h2>
+  <p class="section-note">Still written to be read.</p>
+
+  <section>
+    <h3>Information we collect</h3>
+    <p>When you join the waitlist, we collect your email address. If you answer the optional survey, we may also collect your name, company, role, the help desk tool you use, your answers, and where you came from (referral source). We collect basic first-party usage data on our own site, such as page views, clicks, and waitlist form activity, plus UTM parameters and referrer data. If you become a customer and connect a help desk, we process the support data that connection provides.</p>
+
+    <h3>How we use it</h3>
+    <p>We use this data to run the waitlist, decide what to build, contact you about faro, understand where signups come from, and generate reports and product insights for the customer. That is the whole list. We do not sell it, and we do not use one customer's support data to market to that customer's own users.</p>
+
+    <h3>Cookies and analytics</h3>
+    <p>We use first-party product analytics (PostHog) to understand how people use our own site. This may set a first-party cookie or use local storage to measure visits and events. We do not use third-party advertising cookies, ad pixels, or retargeting trackers. No mystery pixels, no creepy retargeting.</p>
+
+    <h3>Help desk data</h3>
+    <p>When faro connects to your help desk, that access should be read-only unless we clearly state otherwise and you agree. Read-only means read-only: we read tickets and related support data to build your report, and we do not change, send, or delete anything in your help desk. We use this data to generate reports and insights for you, the customer, and for nobody else's marketing.</p>
+
+    <h3>Third-party processors</h3>
+    <p>To run faro, we rely on a small set of providers who process data on our behalf: Supabase (database and hosting), Vercel (hosting), PostHog (first-party analytics), and Resend (email delivery). When you connect a help desk, that provider is also involved. Each has its own privacy practices. We try to keep this list short and to share the minimum that the work requires.</p>
+
+    <h3>Data retention</h3>
+    <p>We keep waitlist and account data for as long as you are on the list or using faro, and for a reasonable period after, unless you ask us to delete it sooner. We do not keep data we do not need.</p>
+
+    <h3>Data deletion requests</h3>
+    <p>You can ask us to delete your data at any time. Email <a href="mailto:info@thefarolab.com">info@thefarolab.com</a> and we will remove it, except for anything we are required to keep by law. We will confirm when it is done.</p>
+
+    <h3>Security</h3>
+    <p>We take reasonable steps to protect your data. The waitlist database uses row-level security, anonymous visitors can only insert, and we do not store passwords or payment card numbers in our own systems. No system is one hundred percent secure, so we cannot promise perfection, but we treat your data as if it were our own.</p>
+
+    <h3>International users</h3>
+    <p>faro is operated from the Dominican Republic, and our providers may process data in other countries, including the United States and the EU. If you join from outside those regions, you understand your data may be processed where we and our providers operate.</p>
+
+    <h3>Changes to this policy</h3>
+    <p>We may update this policy as faro changes. When we do, we will update this page and change the date at the top. If a change is significant, we will try to flag it rather than slip it in quietly.</p>
+
+    <h3>Contact</h3>
+    <p>Questions, concerns, or a deletion request? Email <a href="mailto:info@thefarolab.com">info@thefarolab.com</a>. If something looks wrong, tell us. We would rather know.</p>
+  </section>
+</main>
+
+<footer>faro by TheFaroLab · <a href="mailto:info@thefarolab.com">info@thefarolab.com</a> · Santo Domingo, DR 🇩🇴 · <a href="/terms">Terms</a></footer>
+
+</body>
+</html>
