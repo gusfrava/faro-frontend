@@ -49,6 +49,9 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 
 .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
 .email-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;}
 .email-note::before{content:'→ ';color:var(--light);}
+  .consent-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6;max-width:430px;}
+  .consent-note a{color:var(--dark);text-decoration:underline;}
+  footer a{color:var(--dark);text-decoration:underline;}
 .error-msg{font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);margin-top:4px;display:none;}
 .error-msg.show{display:block;}
 
@@ -731,6 +734,7 @@ footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;fo
     </div>
     <div class="error-msg" id="email-error">please enter a valid email address</div>
     <p class="email-note">no spam · no sales calls · unsubscribe anytime</p>
+    <p class="consent-note">By joining, you agree to Faro's <a href="/terms">Terms</a> and <a href="/privacy-policy">Privacy Policy</a>. No third-party cookies. No ad trackers. No nonsense.</p>
   </div>
 
   <!-- SCREEN 2: PAIN POINT -->
@@ -1003,7 +1007,7 @@ footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;fo
 
 </main>
 
-<footer>faro by TheFaroLab · info@thefarolab.com · Santo Domingo, DR 🇩🇴</footer>
+<footer>faro by TheFaroLab · <a href="mailto:info@thefarolab.com">info@thefarolab.com</a> · Santo Domingo, DR 🇩🇴 · <a href="/terms">Terms</a> · <a href="/privacy-policy">Privacy</a></footer>
 
 <script>
 const SUPABASE_URL = 'https://wtahdncbwkzwszqrpcep.supabase.co';
@@ -1143,9 +1147,7 @@ async function submitEmail() {
     });
     btn.textContent='you are already in';
     setTimeout(() => {
-      sessionStorage.setItem('faro_duplicate_email', email);
-      sessionStorage.setItem('faro_games_source', 'duplicate');
-      window.location.href = 'games/';
+      window.location.href = `faro_games.html?email=${encodeURIComponent(email)}&from=duplicate`;
     }, 250);
     return;
   }
