@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms · faro</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'><rect width='32' height='32' rx='6' fill='%232d6a4f'/><rect x='14' y='2' width='4' height='4' fill='%23b7c99a'/><rect x='12' y='6' width='8' height='4' fill='%23b7c99a'/><rect x='10' y='10' width='12' height='4' fill='%23eef2e6'/><rect x='12' y='14' width='8' height='10' fill='%237d8c4f'/><rect x='10' y='24' width='12' height='2' fill='%23b7c99a'/><rect x='6' y='26' width='20' height='4' fill='%23b7c99a'/></svg>">
+<style>
+  :root{
+    --dark:#2d6a4f;--mid:#7d8c4f;--light:#b7c99a;
+    --tint:#eef2e6;--cream:#faf8f4;--white:#fffefb;
+    --text:#1c2b1e;--muted:#6b7f6e;--border:#d4e0c8;
+    --coral:#e07b54;--amber:#c4933f;--outline:#173823;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.6;}
+  a{color:var(--dark);}
+  header{padding:18px 32px;background:var(--white);border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo-mark{width:28px;height:28px;background:var(--dark);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+  .logo-text{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--dark);}
+  .header-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:48px 24px 64px;}
+  .back{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-decoration:none;display:inline-block;margin-bottom:28px;}
+  .back:hover{color:var(--dark);}
+  h1{font-size:38px;font-weight:700;color:var(--text);letter-spacing:-1px;line-height:1.1;margin-bottom:10px;}
+  h1 .accent{color:var(--coral);font-style:italic;}
+  .updated{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:28px;}
+  .lede{font-size:17px;color:var(--text);margin-bottom:10px;}
+  .lede-sub{font-size:15px;color:var(--muted);margin-bottom:28px;}
+  .callout{border:1.5px solid var(--border);background:var(--white);border-radius:12px;padding:20px 22px;margin:18px 0;}
+  .callout.warn{border-color:var(--coral);}
+  .callout-label{font-weight:700;color:var(--dark);font-size:15px;margin-bottom:8px;}
+  .callout.warn .callout-label{color:var(--coral);}
+  .callout p{font-size:14px;color:var(--text);margin-bottom:8px;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout ul{list-style:none;padding:0;margin:0;}
+  .callout li{font-size:14px;color:var(--text);padding:4px 0 4px 18px;position:relative;}
+  .callout li::before{content:'·';position:absolute;left:4px;color:var(--light);font-weight:700;}
+  .meanit{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);margin:14px 0 28px;}
+  .meanit span{display:block;padding:3px 0;}
+  .meanit span::before{content:'→ ';color:var(--light);}
+  h2{font-size:24px;font-weight:700;color:var(--dark);margin:40px 0 6px;letter-spacing:-.5px;}
+  .section-note{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:18px;}
+  h3{font-size:16px;font-weight:700;color:var(--text);margin:24px 0 6px;}
+  section p{font-size:15px;color:var(--text);margin-bottom:6px;}
+  footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  footer a{color:var(--dark);text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <rect x="7" y="0" width="2" height="2" fill="#b7c99a"/>
+        <rect x="6" y="2" width="4" height="2" fill="#b7c99a"/>
+        <rect x="5" y="4" width="6" height="2" fill="#eef2e6"/>
+        <rect x="6" y="6" width="4" height="6" fill="#7d8c4f"/>
+        <rect x="5" y="12" width="6" height="1" fill="#b7c99a"/>
+        <rect x="3" y="13" width="10" height="2" fill="#b7c99a"/>
+      </svg>
+    </div>
+    <span class="logo-text">faro</span>
+  </a>
+  <span class="header-note">early access · waitlist open</span>
+</header>
+
+<main>
+  <a href="/" class="back">← back to faro</a>
+
+  <h1>Terms, <span class="accent">faro style</span></h1>
+  <p class="updated">Last updated: [set the date when you publish]. faro is operated by TheFaroLab.</p>
+
+  <p class="lede">The internet made terms pages unreadable. We are trying not to do that.</p>
+  <p class="lede-sub">Below is a plain-English summary so you can actually understand what you are agreeing to. The full version is underneath, in the more formal language.</p>
+
+  <div class="callout warn">
+    <div class="callout-label">Read this first</div>
+    <p>This summary is here so humans can understand it. The full terms below are the actual terms. This is not legal advice. We will likely have a lawyer review this before faro leaves beta.</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Short version</div>
+    <ul>
+      <li>Use faro fairly.</li>
+      <li>Do not abuse, scrape, attack, or try to break the service.</li>
+      <li>faro is in early access (beta), so things will change.</li>
+      <li>Reports are generated from your support data. You decide what to do with them, and you are responsible for those decisions.</li>
+      <li>We can suspend access if someone misuses the product.</li>
+      <li>faro belongs to TheFaroLab. Your data still belongs to you.</li>
+      <li>We do not promise everything will be perfect.</li>
+      <li>If something looks wrong, tell us.</li>
+    </ul>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Stuff we do not do</div>
+    <ul>
+      <li>We do not bury surprise clauses in the fine print.</li>
+      <li>We do not claim ownership of your support data.</li>
+      <li>We do not pretend beta software is finished.</li>
+    </ul>
+  </div>
+
+  <div class="meanit">
+    <span>Beta means useful, not perfect.</span>
+    <span>If something breaks, tell us. We would rather know.</span>
+  </div>
+
+  <h2>Legal-ish version</h2>
+  <p class="section-note">This is the part our future lawyer cares about. It is still written to be read.</p>
+
+  <section>
+    <h3>1. Acceptance of terms</h3>
+    <p>By joining the faro waitlist or using faro, you agree to these terms. If you do not agree, please do not use faro. If you are signing up on behalf of a company, you confirm you have the authority to accept these terms for that company.</p>
+
+    <h3>2. Eligibility</h3>
+    <p>You need to be old enough to enter a contract where you live, and able to use faro legally. faro is built for teams doing customer support work, not for personal or consumer use.</p>
+
+    <h3>3. Beta access</h3>
+    <p>faro is in early access. That means features can change, move, or be removed, and there may be bugs, downtime, or rough edges. We provide faro on an "as is" and "as available" basis while it is in beta. Pricing, limits, and availability may change as the product grows. We will try to give reasonable notice for meaningful changes.</p>
+
+    <h3>4. Account and access</h3>
+    <p>You are responsible for keeping any access credentials secure and for activity that happens under your access. If you think someone is using your access without permission, tell us so we can help.</p>
+
+    <h3>5. Acceptable use</h3>
+    <p>Do not misuse faro. That includes scraping or harvesting data you are not entitled to, reverse engineering the service, attacking or overloading our systems, bypassing security or access controls, using faro for anything illegal, or using it to harm other people. We can suspend or remove access if this happens.</p>
+
+    <h3>6. Customer data</h3>
+    <p>"Customer data" means the support data and account information you connect to or put into faro. You keep ownership of your customer data. You give us a limited license to process it only so we can run faro and generate your reports and insights. We do not sell your customer data, and we do not use one customer's support data to market to that customer's own users.</p>
+
+    <h3>7. Intellectual property</h3>
+    <p>faro, including the software, the reports engine, the brand, and Alfaro, belongs to TheFaroLab. We give you a limited, revocable, non-transferable license to use faro while you have access. Feedback you send us is appreciated, and we may use it to improve faro without obligation to you.</p>
+
+    <h3>8. Third-party services</h3>
+    <p>faro relies on third-party services to run, and it connects to tools you choose, such as your help desk. Those providers have their own terms, and we are not responsible for how they operate. Current core providers include Supabase (database and hosting), Vercel (hosting), PostHog (first-party product analytics), and Resend (email). When you connect a help desk, that connection is governed by both that provider's terms and these terms.</p>
+
+    <h3>9. Disclaimers</h3>
+    <p>faro is provided "as is" and "as available," especially during beta. We do not warrant that it will be uninterrupted, error free, or fit for a particular purpose. Reports are informational. They are a read on your support data, not professional, legal, or financial advice, and not a substitute for your own judgment.</p>
+
+    <h3>10. Limitation of liability</h3>
+    <p>To the fullest extent allowed by law, TheFaroLab is not liable for indirect, incidental, special, or consequential damages, or for lost profits or data, arising from your use of faro. Where liability cannot be excluded, our total liability is limited to the greater of the amount you paid us for faro in the three months before the claim, or one hundred US dollars. Some places do not allow these limits, so parts of this section may not apply to you.</p>
+
+    <h3>11. Termination</h3>
+    <p>You can stop using faro at any time. We can suspend or end access if you misuse the product, break these terms, or if we need to in order to comply with the law or protect the service. When access ends, your right to use faro ends. We will handle any data deletion as described in the Privacy Policy.</p>
+
+    <h3>12. Changes to terms</h3>
+    <p>We may update these terms as faro changes. When we do, we will update this page and change the date at the top instead of pretending nobody reads it. If a change is significant, we will try to flag it. Continuing to use faro after an update means you accept the new terms.</p>
+
+    <h3>13. Contact</h3>
+    <p>If something looks wrong, or you just have a question, email us at <a href="mailto:info@thefarolab.com">info@thefarolab.com</a>. We would rather hear from you than not.</p>
+  </section>
+</main>
+
+<footer>faro by TheFaroLab · <a href="mailto:info@thefarolab.com">info@thefarolab.com</a> · Santo Domingo, DR 🇩🇴 · <a href="/privacy-policy">Privacy</a></footer>
+
+</body>
+</html>
